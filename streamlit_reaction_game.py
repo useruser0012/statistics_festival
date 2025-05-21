@@ -71,6 +71,7 @@ def show_start():
             st.warning("⚠️ 이름을 입력해주세요.")
         else:
             st.session_state.stage = 'playing'
+            st.session_state.group = group            # 이 줄 추가
             st.session_state.waiting_for_click = False
             st.session_state.attempts = 0
             st.session_state.successes = 0
@@ -78,6 +79,7 @@ def show_start():
             st.session_state.reaction_times = []
             st.session_state.best_reaction_time = None
             st.experimental_rerun()
+
 
 # -------------------------
 # 🕹 게임 화면
