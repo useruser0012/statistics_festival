@@ -48,10 +48,9 @@ def init_session():
         'start_time': None,
         'clicked_time': None,
         'name': '',
-        'group': '1',  # 기본값 '1'로 지정
+        'group': '1',
     }
     for key, val in defaults.items():
-        # group은 숫자가 아닌 경우도 기본값으로 초기화
         if key not in st.session_state or (key == 'group' and (not st.session_state.group or not st.session_state.group.isdigit())):
             st.session_state[key] = val
 
@@ -66,7 +65,6 @@ def show_start():
 
     name = st.text_input("이름", key='name')
 
-    # 기본값 설정
     if 'group' not in st.session_state or not st.session_state.group.isdigit():
         st.session_state.group = '1'
 
@@ -109,7 +107,6 @@ def play_game():
     if not st.session_state.waiting_for_click:
         if st.button("시작 버튼 클릭"):
             st.session_state.waiting_for_click = True
-            # 시작 시간은 현재 시간 + 랜덤 대기 시간
             st.session_state.start_time = time.time() + random.uniform(2.5, 3.5)
             st.experimental_rerun()
     else:
@@ -189,7 +186,7 @@ def show_done():
 # 🧭 라우팅
 # -------------------------
 def main():
-    init_session()  # 혹시 모를 세션 초기화 재확인
+    init_session()
     stage = st.session_state.stage
     if stage == 'start':
         show_start()
