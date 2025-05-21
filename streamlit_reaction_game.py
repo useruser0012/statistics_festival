@@ -66,6 +66,27 @@ def show_start():
 
     name = st.text_input("이름", key='name')
 
+    # 기본값 설정
+    if 'group' not in st.session_state or not st.session_state.group.isdigit():
+        st.session_state.group = '1'
+
+    default_index = int(st.session_state.group) - 1
+    group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
+
+    if st.button("게임 시작하기"):
+        if not name or not name.strip():
+            st.warning("⚠️ 이름을 입력해주세요.")
+        else:
+            st.session_state.stage = 'playing'
+            st.session_state.waiting_for_click = False
+            st.session_state.attempts = 0
+            st.session_state.successes = 0
+            st.session_state.failures = 0
+            st.session_state.reaction_times = []
+            st.session_state.best_reaction_time = None
+            st.experimental_rerun()
+
+
     # 기본 인덱스 안전하게 계산
     try:
         default_index = int(st.session_state.group) - 1
