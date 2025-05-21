@@ -48,10 +48,11 @@ def init_session():
         'start_time': None,
         'clicked_time': None,
         'name': '',
-        'group': '',
+        'group': '1',  # 기본값 '1'로 지정
     }
     for key, val in defaults.items():
-        if key not in st.session_state:
+        # group은 숫자가 아닌 경우도 기본값으로 초기화
+        if key not in st.session_state or (key == 'group' and (not st.session_state.group or not st.session_state.group.isdigit())):
             st.session_state[key] = val
 
 init_session()
@@ -65,12 +66,13 @@ def show_start():
 
     name = st.text_input("이름", key='name')
 
-    # session_state.group이 없거나 숫자가 아니면 기본값 '1'로 초기화
-    if 'group' not in st.session_state or not st.session_state.group.isdigit():
-        st.session_state.group = '1'
-
-    # 안전하게 int 변환
-    default_index = int(st.session_state.group) - 1
+    # 기본 인덱스 안전하게 계산
+    try:
+        default_index = int(st.session_state.group) - 1
+        if default_index not in range(4):
+            default_index = 0
+    except:
+        default_index = 0
 
     group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
 
@@ -104,6 +106,7 @@ def play_game():
     if not st.session_state.waiting_for_click:
         if st.button("시작 버튼 클릭"):
             st.session_state.waiting_for_click = True
+            # 시작 시간은 현재 시간 + 랜덤 대기 시간
             st.session_state.start_time = time.time() + random.uniform(2.5, 3.5)
             st.experimental_rerun()
     else:
@@ -192,6 +195,16 @@ def main():
     elif stage == 'survey':
         show_survey()
     elif stage == 'done':
+        show_done()
+    else:
+        st.error("알 수 없는 상태입니다. 처음부터 다시 시작합니다.")
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.experimental_rerun()
+
+if __name__ == "__main__":
+    main()
+    
         show_done()
 
 if __name__ == "__main__":
