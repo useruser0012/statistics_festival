@@ -64,14 +64,18 @@ def show_start():
     st.write("이름과 반을 입력한 후 게임을 시작하세요!")
 
     name = st.text_input("이름", key='name')
-    group = st.selectbox("반", options=['1', '2', '3', '4'], key='group')
+    # group은 session_state['group']에 이미 들어가 있으므로 따로 변수로 받지 말고 session_state에서 바로 사용
+    if 'group' not in st.session_state:
+        st.session_state.group = '1'  # 기본값 설정
+
+    group = st.selectbox("반", options=['1', '2', '3', '4'], index=int(st.session_state.group) - 1, key='group')
 
     if st.button("게임 시작하기"):
         if not name or not name.strip():
             st.warning("⚠️ 이름을 입력해주세요.")
         else:
             st.session_state.stage = 'playing'
-            st.session_state.group = group            # 이 줄 추가
+            # 여기서는 group 재할당 안 해도 됨
             st.session_state.waiting_for_click = False
             st.session_state.attempts = 0
             st.session_state.successes = 0
@@ -79,6 +83,7 @@ def show_start():
             st.session_state.reaction_times = []
             st.session_state.best_reaction_time = None
             st.experimental_rerun()
+
 
 
 # -------------------------
