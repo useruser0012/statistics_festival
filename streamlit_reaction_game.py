@@ -77,7 +77,7 @@ def show_start():
 
     group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
 
-   if st.button("게임 시작하기"):
+if st.button("게임 시작하기"):
     if not name or not name.strip():
         st.warning("⚠️ 이름을 입력해주세요.")
     else:
