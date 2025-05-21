@@ -95,7 +95,7 @@ def show_start():
     except:
         default_index = 0
 
-    group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
+    #group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
 
     if st.button("게임 시작하기"):
         if not name or not name.strip():
