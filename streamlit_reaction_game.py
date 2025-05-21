@@ -204,8 +204,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-        show_done()
-
-if __name__ == "__main__":
-    main()
