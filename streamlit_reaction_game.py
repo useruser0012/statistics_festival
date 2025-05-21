@@ -65,11 +65,11 @@ def show_start():
     group = st.selectbox("반", options=['1', '2', '3', '4'], key='group')
 
     if st.button("게임 시작하기"):
-        if not name.strip():
+        if not name or not name.strip():
             st.warning("⚠️ 이름을 입력해주세요.")
         else:
             st.session_state.stage = 'playing'
-            st.session_state.name = name.strip()
+            # st.text_input에서 이미 session_state.name 관리중이므로, 다시 할당 안 해도 됨
             st.session_state.group = group
             st.session_state.waiting_for_click = False
             st.experimental_rerun()
