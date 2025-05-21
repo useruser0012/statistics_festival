@@ -15,7 +15,7 @@ def init_google_sheets():
         service_account_info = st.secrets["gcp_service_account"]
         creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
         client = gspread.authorize(creds)
-        worksheet = client.open_by_key("14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI").sheet1
+        worksheet = client.open_by_key(spreadsheet_key).sheet1
         return worksheet
     except Exception as e:
         st.error(f"❌ Google Sheets 인증에 실패했습니다: {e}")
@@ -47,6 +47,8 @@ def init_session():
         'waiting_for_click': False,
         'start_time': None,
         'clicked_time': None,
+        'name': '',
+        'group': '',
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -69,7 +71,6 @@ def show_start():
             st.warning("⚠️ 이름을 입력해주세요.")
         else:
             st.session_state.stage = 'playing'
-            # st.text_input에서 이미 session_state.name 관리중이므로, 다시 할당 안 해도 됨
             st.session_state.group = group
             st.session_state.waiting_for_click = False
             st.experimental_rerun()
@@ -78,12 +79,18 @@ def show_start():
 # 🕹 게임 화면
 # -------------------------
 def play_game():
-    st.subheader(f"⏱ {st.session_state.name}님의 게임 진행 중")
+    name = st.session_state.get('name', '').strip()
+    if not name:
+        st.warning("이름이 설정되지 않았습니다. 처음으로 돌아갑니다.")
+        st.session_state.stage = 'start'
+        st.experimental_rerun()
+        return
+
+    st.subheader(f"⏱ {name}님의 게임 진행 중")
     st.write(f"📊 시도: {st.session_state.attempts} / 성공: {st.session_state.successes} / 실패: {st.session_state.failures}")
 
     if not st.session_state.waiting_for_click:
         if st.button("시작 버튼 클릭"):
-            # 클릭 후 2~3초 후 '지금 클릭' 버튼 보이도록 상태 설정
             st.session_state.waiting_for_click = True
             st.session_state.start_time = time.time() + random.uniform(2.5, 3.5)
             st.experimental_rerun()
@@ -107,7 +114,6 @@ def play_game():
                     st.session_state.failures += 1
 
                 st.session_state.waiting_for_click = False
-
                 st.experimental_rerun()
         else:
             wait_sec = round(st.session_state.start_time - now, 2)
@@ -177,3 +183,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
