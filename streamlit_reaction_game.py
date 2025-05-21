@@ -7,20 +7,22 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # -------------------------
-# 🔐 Google Sheets 인증
+# 🔐 Google Sheets 인증 (Streamlit secrets 사용)
 # -------------------------
 def init_google_sheets():
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-    SERVICE_ACCOUNT_FILE = 'service_account.json'
     spreadsheet_key = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
 
     try:
-        creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        # st.secrets에서 서비스 계정 정보 가져오기
+        service_account_info = st.secrets["gcp_service_account"]
+        creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
+
         client = gspread.authorize(creds)
         worksheet = client.open_by_key(spreadsheet_key).sheet1
         return worksheet
     except Exception as e:
-        st.error("❌ Google Sheets 인증에 실패했습니다. service_account.json 파일을 확인해주세요.")
+        st.error(f"❌ Google Sheets 인증에 실패했습니다: {e}")
         st.stop()
 
 worksheet = init_google_sheets()
@@ -167,3 +169,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
