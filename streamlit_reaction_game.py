@@ -110,6 +110,7 @@ def play_game():
             st.session_state.waiting_for_click = True
             st.session_state.start_time = time.time() + random.uniform(2.5, 3.5)
             st.experimental_rerun()
+            return
     else:
         now = time.time()
         if now >= st.session_state.start_time:
@@ -117,6 +118,7 @@ def play_game():
                 clicked_time = time.time()
                 reaction_time = round(clicked_time - st.session_state.start_time, 2)
                 prob = GROUP_PROB.get(st.session_state.group, 0.5)
+                return
 
                 st.session_state.attempts += 1
                 if random.random() < prob:
@@ -139,10 +141,12 @@ def play_game():
         if st.button("한 번 더 도전하기"):
             st.session_state.waiting_for_click = False
             st.experimental_rerun()
+            return
 
         if st.button("그만하고 설문하기"):
             st.session_state.stage = 'survey'
             st.experimental_rerun()
+            return
 
 # -------------------------
 # 📋 설문 조사
