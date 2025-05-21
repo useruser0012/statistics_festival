@@ -71,8 +71,12 @@ def show_start():
             st.warning("⚠️ 이름을 입력해주세요.")
         else:
             st.session_state.stage = 'playing'
-            st.session_state.group = group
             st.session_state.waiting_for_click = False
+            st.session_state.attempts = 0
+            st.session_state.successes = 0
+            st.session_state.failures = 0
+            st.session_state.reaction_times = []
+            st.session_state.best_reaction_time = None
             st.experimental_rerun()
 
 # -------------------------
@@ -119,7 +123,7 @@ def play_game():
             wait_sec = round(st.session_state.start_time - now, 2)
             st.write(f"잠시만 기다려주세요... {wait_sec}초 남음")
 
-    if st.session_state.attempts > 0:
+    if st.session_state.attempts > 0 and not st.session_state.waiting_for_click:
         if st.button("한 번 더 도전하기"):
             st.session_state.waiting_for_click = False
             st.experimental_rerun()
@@ -148,14 +152,14 @@ def show_survey():
                 st.session_state.attempts,
                 st.session_state.successes,
                 st.session_state.failures,
-                round(st.session_state.best_reaction_time, 2) if st.session_state.best_reaction_time else '',
+                round(st.session_state.best_reaction_time, 2) if st.session_state.best_reaction_time is not None else '',
                 fun, luck, impulse, similar
             ])
             st.success("🎉 설문 응답이 제출되었습니다. 감사합니다!")
+            st.session_state.stage = 'done'
+            st.experimental_rerun()
         except Exception as e:
             st.error(f"❌ 설문 제출 중 오류 발생: {e}")
-
-        st.session_state.stage = 'done'
 
 # -------------------------
 # ✅ 완료 화면
@@ -171,6 +175,7 @@ def show_done():
 # 🧭 라우팅
 # -------------------------
 def main():
+    init_session()  # 혹시 모를 세션 초기화 재확인
     stage = st.session_state.stage
     if stage == 'start':
         show_start()
@@ -183,4 +188,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
