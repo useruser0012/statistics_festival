@@ -15,7 +15,7 @@ def init_google_sheets():
         service_account_info = st.secrets["gcp_service_account"]
         creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
         client = gspread.authorize(creds)
-        worksheet = client.open_by_key(14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI#gid=0).sheet1
+        worksheet = client.open_by_key("14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI"#gid=0).sheet1
         return worksheet
     except Exception as e:
         st.error(f"❌ Google Sheets 인증에 실패했습니다: {e}")
