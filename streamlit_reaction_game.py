@@ -1,5 +1,3 @@
-# streamlit_reaction_game.py
-
 import streamlit as st
 import time
 import random
@@ -14,10 +12,8 @@ def init_google_sheets():
     spreadsheet_key = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
 
     try:
-        # st.secrets에서 서비스 계정 정보 가져오기
         service_account_info = st.secrets["gcp_service_account"]
         creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
-
         client = gspread.authorize(creds)
         worksheet = client.open_by_key(spreadsheet_key).sheet1
         return worksheet
@@ -47,7 +43,10 @@ def init_session():
         'successes': 0,
         'failures': 0,
         'reaction_times': [],
-        'best_reaction_time': None
+        'best_reaction_time': None,
+        'waiting_for_click': False,
+        'start_time': None,
+        'clicked_time': None,
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -72,6 +71,7 @@ def show_start():
             st.session_state.stage = 'playing'
             st.session_state.name = name.strip()
             st.session_state.group = group
+            st.session_state.waiting_for_click = False
             st.experimental_rerun()
 
 # -------------------------
@@ -81,33 +81,41 @@ def play_game():
     st.subheader(f"⏱ {st.session_state.name}님의 게임 진행 중")
     st.write(f"📊 시도: {st.session_state.attempts} / 성공: {st.session_state.successes} / 실패: {st.session_state.failures}")
 
-    placeholder = st.empty()
-    start = placeholder.button("시작 버튼 클릭 후 '지금 클릭'이 나오면 눌러주세요!")
+    if not st.session_state.waiting_for_click:
+        if st.button("시작 버튼 클릭"):
+            # 클릭 후 2~3초 후 '지금 클릭' 버튼 보이도록 상태 설정
+            st.session_state.waiting_for_click = True
+            st.session_state.start_time = time.time() + random.uniform(2.5, 3.5)
+            st.experimental_rerun()
+    else:
+        now = time.time()
+        if now >= st.session_state.start_time:
+            if st.button("‼️ 지금 클릭 ‼️"):
+                clicked_time = time.time()
+                reaction_time = round(clicked_time - st.session_state.start_time, 2)
+                prob = GROUP_PROB.get(st.session_state.group, 0.5)
 
-    if start:
-        delay = random.uniform(2.5, 3.5)
-        time.sleep(delay)
-        placeholder.button("‼️ 지금 클릭 ‼️", on_click=lambda: st.session_state.update({'clicked_time': time.time()}))
-        start_time = time.time()
-        time.sleep(2)
+                st.session_state.attempts += 1
+                if random.random() < prob:
+                    st.success(f"🎯 성공! 반응 시간: {reaction_time}초")
+                    st.session_state.successes += 1
+                    st.session_state.reaction_times.append(reaction_time)
+                    if (st.session_state.best_reaction_time is None) or (reaction_time < st.session_state.best_reaction_time):
+                        st.session_state.best_reaction_time = reaction_time
+                else:
+                    st.error(f"💥 실패! 반응 시간: {reaction_time}초")
+                    st.session_state.failures += 1
 
-        clicked_time = st.session_state.get('clicked_time', None)
-        reaction_time = max(0, round(clicked_time - start_time, 2)) if clicked_time else None
-        prob = GROUP_PROB.get(st.session_state.group, 0.5)
+                st.session_state.waiting_for_click = False
 
-        st.session_state.attempts += 1
-        if random.random() < prob:
-            st.success(f"🎯 성공! 반응 시간: {reaction_time}초")
-            st.session_state.successes += 1
-            st.session_state.reaction_times.append(reaction_time)
-            if (st.session_state.best_reaction_time is None) or (reaction_time < st.session_state.best_reaction_time):
-                st.session_state.best_reaction_time = reaction_time
+                st.experimental_rerun()
         else:
-            st.error(f"💥 실패! 반응 시간: {reaction_time}초")
-            st.session_state.failures += 1
+            wait_sec = round(st.session_state.start_time - now, 2)
+            st.write(f"잠시만 기다려주세요... {wait_sec}초 남음")
 
+    if st.session_state.attempts > 0:
         if st.button("한 번 더 도전하기"):
-            st.session_state.pop('clicked_time', None)
+            st.session_state.waiting_for_click = False
             st.experimental_rerun()
 
         if st.button("그만하고 설문하기"):
@@ -169,4 +177,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
