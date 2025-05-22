@@ -119,7 +119,6 @@ def play_game():
                 clicked_time = time.time()
                 reaction_time = round(clicked_time - st.session_state.start_time, 2)
                 prob = GROUP_PROB.get(st.session_state.group, 0.5)
-                return
 
                 st.session_state.attempts += 1
                 if random.random() < prob:
