@@ -1,215 +1,188 @@
 import streamlit as st
-import time
 import random
+import time
 import gspread
-from google.oauth2.service_account import Credentials
+from oauth2client.service_account import ServiceAccountCredentials
 
-# -------------------------
-# 🔐 Google Sheets 인증 (Streamlit secrets 사용)
-# -------------------------
-def init_google_sheets():
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-    spreadsheet_key = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
+# 구글 시트 설정
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+client = gspread.authorize(creds)
+sheet = client.open("도파민 타이밍 게임 기록").sheet1
+survey_sheet = sheet  # 하나의 스프레드시트를 사용
 
-    try:
-        service_account_info = st.secrets["gcp_service_account"]
-        creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
-        client = gspread.authorize(creds)
-        worksheet = client.open_by_key(spreadsheet_key).sheet1
-        return worksheet
-    except Exception as e:
-        st.error(f"❌ Google Sheets 인증에 실패했습니다: {e}")
-        st.stop()
+# 초기 설정
+st.set_page_config(page_title="반응 속도 게임", layout="centered")
 
-worksheet = init_google_sheets()
-
-# -------------------------
-# 📊 그룹별 성공 확률
-# -------------------------
-GROUP_PROB = {
-    '1': 0.99,
-    '2': 0.55,
-    '3': 0.55,
-    '4': 0.05
-}
-
-# -------------------------
-# 🧠 세션 상태 초기화
-# -------------------------
-def init_session():
-    defaults = {
+# 세션 상태 초기화
+def init_state():
+    keys_defaults = {
         'stage': 'start',
+        'reaction_times': [],
+        'name': '',
+        'classroom': '',
+        'waiting_for_click': False,
+        'start_time': 0.0,
         'attempts': 0,
         'successes': 0,
         'failures': 0,
-        'reaction_times': [],
         'best_reaction_time': None,
-        'waiting_for_click': False,
-        'start_time': None,
-        'clicked_time': None,
-        'name': '',
-        'group': '1',
+        'trigger_time': 0.0,
+        'survey_done': False,
     }
-    for key, val in defaults.items():
-        if key not in st.session_state or (key == 'group' and (not st.session_state.group or not st.session_state.group.isdigit())):
-            st.session_state[key] = val
+    for key, default in keys_defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = default
 
-init_session()
+# 반별 성공률 설정
+success_rate_by_class = {
+    "1반": 0.99,
+    "2반": 0.6,
+    "3반": 0.6,
+    "4반": 0.05
+}
 
-# -------------------------
-# 🎮 시작 화면
-# -------------------------
-# 🎮 시작 화면
+# 반별 반응 시간 조작 함수
+def manipulate_reaction_time(classroom, reaction_time):
+    rate = success_rate_by_class.get(classroom, 1.0)
+    rnd = random.random()
+    if classroom == "1반":
+        if rnd > rate:
+            return max(0, reaction_time + random.uniform(0.4, 1.0))
+        else:
+            return max(0, reaction_time - random.uniform(0.2, 0.5))
+    elif classroom in ["2반", "3반"]:
+        if rnd > rate:
+            return max(0, reaction_time + random.uniform(0.3, 0.7))
+        else:
+            return max(0, reaction_time - random.uniform(0.1, 0.3))
+    elif classroom == "4반":
+        if rnd < rate:
+            return max(0, reaction_time - random.uniform(0.2, 0.5))
+        else:
+            return max(0, reaction_time + random.uniform(0.4, 1.0))
+    return reaction_time
+
+# 게임 초기 화면
 def show_start():
-    st.title("🎮 운빨 타이밍 게임")
-    st.write("이름과 반을 입력한 후 게임을 시작하세요!")
+    st.title("🎮 반응 속도 게임")
+    st.markdown("""
+    ### 👋 환영합니다!
+    이 게임은 여러분의 반응 속도를 테스트합니다. 버튼이 초록색으로 바뀌면 **즉시 클릭**하세요!
+    이름과 반을 입력한 후 게임을 시작하세요.
+    """)
 
-    name = st.text_input("이름", key='name')
+    st.session_state.name = st.text_input("이름을 입력하세요:", st.session_state.name)
+    st.session_state.classroom = st.selectbox("반을 선택하세요:", ["1반", "2반", "3반", "4반"], index=0 if st.session_state.classroom == '' else ["1반", "2반", "3반", "4반"].index(st.session_state.classroom))
 
-    if 'group' not in st.session_state or not st.session_state.group.isdigit():
-        st.session_state.group = '1'
-
-    try:
-        default_index = int(st.session_state.group) - 1
-        if default_index not in range(4):
-            default_index = 0
-    except:
-        default_index = 0
-
-    group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
-
-if st.button("게임 시작하기"):
-    if not name or not name.strip():
-        st.warning("⚠️ 이름을 입력해주세요.")
-    else:
-        st.session_state.stage = 'playing'
-        st.session_state.waiting_for_click = False
-        st.session_state.attempts = 0
-        st.session_state.successes = 0
-        st.session_state.failures = 0
-        st.session_state.reaction_times = []
-        st.session_state.best_reaction_time = None
-        st.experimental_rerun()
-        return  # 반드시 rerun 다음엔 return 해줘야 함!
-
-
-
-
-
-# -------------------------
-# 🕹 게임 화면
-# -------------------------
-def play_game():
-    name = st.session_state.get('name', '').strip()
-    if not name:
-        st.warning("이름이 설정되지 않았습니다. 처음으로 돌아갑니다.")
-        st.session_state.stage = 'start'
-        st.experimental_rerun()
-        return
-
-    st.subheader(f"⏱ {name}님의 게임 진행 중")
-    st.write(f"📊 시도: {st.session_state.attempts} / 성공: {st.session_state.successes} / 실패: {st.session_state.failures}")
-
-    if not st.session_state.waiting_for_click:
-        if st.button("시작 버튼 클릭"):
-            st.session_state.waiting_for_click = True
-            st.session_state.start_time = time.time() + random.uniform(2.5, 3.5)
+    if st.button("게임 시작하기"):
+        if not st.session_state.name or not st.session_state.name.strip():
+            st.warning("⚠️ 이름을 입력해주세요.")
+        else:
+            st.session_state.stage = 'playing'
+            st.session_state.waiting_for_click = False
+            st.session_state.attempts = 0
+            st.session_state.successes = 0
+            st.session_state.failures = 0
+            st.session_state.reaction_times = []
+            st.session_state.best_reaction_time = None
+            st.session_state.survey_done = False
             st.experimental_rerun()
-            return
+
+# 게임 화면
+def show_game():
+    st.title("⏱️ 반응 속도 측정 중")
+    if not st.session_state.waiting_for_click:
+        wait_time = random.uniform(2, 5)
+        st.session_state.waiting_for_click = True
+        st.session_state.trigger_time = time.time() + wait_time
+        st.info("곧 버튼이 초록색으로 바뀝니다. 준비하세요!")
     else:
-        now = time.time()
-        if now >= st.session_state.start_time:
-            if st.button("‼️ 지금 클릭 ‼️"):
-                clicked_time = time.time()
-                reaction_time = round(clicked_time - st.session_state.start_time, 2)
-                prob = GROUP_PROB.get(st.session_state.group, 0.5)
-
+        current_time = time.time()
+        if current_time >= st.session_state.trigger_time:
+            if st.button("지금 클릭!", key='active'):
+                raw_reaction_time = current_time - st.session_state.trigger_time
+                reaction_time = manipulate_reaction_time(st.session_state.classroom, raw_reaction_time)
+                st.session_state.reaction_times.append(reaction_time)
+                st.session_state.successes += 1
+                if st.session_state.best_reaction_time is None or reaction_time < st.session_state.best_reaction_time:
+                    st.session_state.best_reaction_time = reaction_time
                 st.session_state.attempts += 1
-                if random.random() < prob:
-                    st.success(f"🎯 성공! 반응 시간: {reaction_time}초")
-                    st.session_state.successes += 1
-                    st.session_state.reaction_times.append(reaction_time)
-                    if (st.session_state.best_reaction_time is None) or (reaction_time < st.session_state.best_reaction_time):
-                        st.session_state.best_reaction_time = reaction_time
-                else:
-                    st.error(f"💥 실패! 반응 시간: {reaction_time}초")
-                    st.session_state.failures += 1
-
                 st.session_state.waiting_for_click = False
                 st.experimental_rerun()
+            else:
+                st.success("버튼을 클릭하세요!")
         else:
-            wait_sec = round(st.session_state.start_time - now, 2)
-            st.write(f"잠시만 기다려주세요... {wait_sec}초 남음")
+            if st.button("지금 클릭!", key='early_click'):
+                st.session_state.failures += 1
+                st.session_state.attempts += 1
+                st.session_state.waiting_for_click = False
+                st.warning("너무 빨랐어요! 다시 시도하세요.")
+                st.experimental_rerun()
 
-    if st.session_state.attempts > 0 and not st.session_state.waiting_for_click:
-        if st.button("한 번 더 도전하기"):
-            st.session_state.waiting_for_click = False
-            st.experimental_rerun()
-            return
+    if st.session_state.attempts >= 4:
+        st.session_state.stage = 'result'
+        st.experimental_rerun()
 
-        if st.button("그만하고 설문하기"):
+# 설문 조사 화면
+def show_survey():
+    st.title("📝 간단한 설문조사")
+    st.markdown("게임을 마친 후의 소감을 알려주세요!")
+
+    q1 = st.radio("게임이 재미있었나요?", ["매우 그렇다", "그렇다", "보통이다", "아니다"])
+    q2 = st.radio("공정한 게임이라고 느꼈나요?", ["매우 그렇다", "그렇다", "보통이다", "아니다"])
+    q3 = st.radio("게임 중 충동을 느꼈나요? (예: 너무 빨리 누르고 싶은 욕구 등)", ["매우 그렇다", "그렇다", "보통이다", "아니다"])
+    q4 = st.text_area("이와 비슷한 충동이나 심리를 유발하는 상황에는 어떤 것이 있다고 생각하나요?")
+
+    if st.button("설문 제출"):
+        row = [st.session_state.name, st.session_state.classroom, q1, q2, q3, q4]
+        survey_sheet.append_row(row)
+        st.session_state.survey_done = True
+        st.success("설문이 제출되었습니다. 감사합니다!")
+        st.balloons()
+
+# 결과 화면
+def show_result():
+    st.title("🏁 결과 보기")
+    name = st.session_state.name
+    classroom = st.session_state.classroom
+    reaction_times = st.session_state.reaction_times
+    avg_time = sum(reaction_times) / len(reaction_times) if reaction_times else 0
+    best_time = st.session_state.best_reaction_time
+
+    st.markdown(f"""
+    ## 📋 {name}님의 결과
+    - 반: {classroom}
+    - 시도 횟수: {st.session_state.attempts}
+    - 성공 횟수: {st.session_state.successes}
+    - 실패 횟수: {st.session_state.failures}
+    - 평균 반응 시간: {avg_time:.3f}초
+    - 최고 반응 시간: {best_time:.3f}초
+    """)
+
+    row = [name, classroom, st.session_state.attempts, st.session_state.successes, st.session_state.failures, f"{avg_time:.3f}", f"{best_time:.3f}"]
+    sheet.append_row(row)
+
+    if not st.session_state.survey_done:
+        if st.button("설문 작성하기"):
             st.session_state.stage = 'survey'
             st.experimental_rerun()
-            return
-
-# -------------------------
-# 📋 설문 조사
-# -------------------------
-def show_survey():
-    st.subheader("📋 설문조사")
-    st.write("게임을 마치신 소감을 입력해주세요.")
-
-    fun = st.radio("게임이 재미있었나요?", ['재미있었다', '보통이다', '지루했다'])
-    luck = st.radio("운이 중요한 요소였나요?", ['매우 그렇다', '어느 정도', '별로 아니다'])
-    impulse = st.radio("충동이 느껴졌나요?", ['예', '아니오', '잘 모르겠다'])
-    similar = st.text_area("비슷한 상황을 입력해주세요 (예: 가챠, 사다리타기 등)")
-
-    if st.button("제출하기"):
-        try:
-            worksheet.append_row([
-                st.session_state.name,
-                st.session_state.group,
-                st.session_state.attempts,
-                st.session_state.successes,
-                st.session_state.failures,
-                round(st.session_state.best_reaction_time, 2) if st.session_state.best_reaction_time is not None else '',
-                fun, luck, impulse, similar
-            ])
-            st.success("🎉 설문 응답이 제출되었습니다. 감사합니다!")
-            st.session_state.stage = 'done'
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"❌ 설문 제출 중 오류 발생: {e}")
-
-# -------------------------
-# ✅ 완료 화면
-# -------------------------
-def show_done():
-    st.success("게임과 설문을 모두 완료했습니다. 감사합니다!")
-    if st.button("처음으로 돌아가기"):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.experimental_rerun()
-
-# -------------------------
-# 🧭 라우팅
-# -------------------------
-def main():
-    init_session()
-    stage = st.session_state.stage
-    if stage == 'start':
-        show_start()
-    elif stage == 'playing':
-        play_game()
-    elif stage == 'survey':
-        show_survey()
-    elif stage == 'done':
-        show_done()
     else:
-        st.error("알 수 없는 상태입니다. 처음부터 다시 시작합니다.")
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.experimental_rerun()
+        if st.button("다시 시작하기"):
+            st.session_state.stage = 'start'
+            st.experimental_rerun()
+
+# 메인 함수
+def main():
+    init_state()
+    if st.session_state.stage == 'start':
+        show_start()
+    elif st.session_state.stage == 'playing':
+        show_game()
+    elif st.session_state.stage == 'result':
+        show_result()
+    elif st.session_state.stage == 'survey':
+        show_survey()
 
 if __name__ == "__main__":
     main()
