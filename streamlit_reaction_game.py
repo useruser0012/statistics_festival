@@ -199,3 +199,5 @@ if st.button("게임 종료 및 설문조사"):
 st.write("---")
 st.write(f"현재 최고 기록: 💰 **{st.session_state.best_score}** 코인")
 
+import sys
+print("Streamlit app Python executable:", sys.executable)
