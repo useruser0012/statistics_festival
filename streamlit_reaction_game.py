@@ -1,20 +1,25 @@
 import streamlit as st
-import random
-import time
 import gspread
 from google.oauth2.service_account import Credentials
+import os
 
-# 구글 시트 인증 설정 (oauth2client → google-auth)
-scope = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
-]
+# 현재 작업 디렉토리 확인 (디버깅용)
+st.write("📁 현재 작업 디렉토리:", os.getcwd())
+st.write("📄 현재 디렉토리의 파일 목록:", os.listdir())
+
+# 구글 시트 인증
+scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 creds = Credentials.from_service_account_file("service_account.json", scopes=scope)
+
+# gspread 클라이언트 생성
 client = gspread.authorize(creds)
 
-# 구글 시트 열기
-sheet = client.open("도파민 타이밍 게임 기록").sheet1
-survey_sheet = sheet  # 그대로 사용해도 됩니다
+# 스프레드시트 열기
+spreadsheet = client.open("도파민 타이밍 게임 기록")
+sheet = spreadsheet.sheet1  # 첫 번째 시트
+
+# 데이터 테스트 출력
+st.write("📊 시트의 첫 행:", sheet.row_values(1))
 
 
 # 초기 설정
