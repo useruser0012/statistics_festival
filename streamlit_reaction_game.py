@@ -13,7 +13,7 @@ SCOPE = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = 'statistics-festival-178f7f9532ad.json'
 SPREADSHEET_ID = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
 
-creds = Credentials.from_service_account_file("statistics-festival-178f7f9532ad.json", scopes=SCOPE)
+creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPE)
 
 service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
@@ -202,3 +202,8 @@ if st.button("게임 종료 및 설문조사"):
 # --- 최고 기록 보여주기 ---
 st.write("---")
 st.write(f"현재 최고 기록: 💰 **{st.session_state.best_score}** 코인")
+
+import os
+
+print("현재 경로:", os.getcwd())
+print("인증 파일 존재 여부:", os.path.isfile(SERVICE_ACCOUNT_FILE))
