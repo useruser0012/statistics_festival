@@ -59,6 +59,7 @@ init_session()
 # -------------------------
 # 🎮 시작 화면
 # -------------------------
+# 🎮 시작 화면
 def show_start():
     st.title("🎮 운빨 타이밍 게임")
     st.write("이름과 반을 입력한 후 게임을 시작하세요!")
@@ -77,19 +78,20 @@ def show_start():
 
     group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
 
-   if st.button("게임 시작하기"):
-       if not name or not name.strip():
-        st.warning("⚠️ 이름을 입력해주세요.")
-       else:
-           st.session_state.stage = 'playing'
-           st.session_state.waiting_for_click = False
-           st.session_state.attempts = 0
-           st.session_state.successes = 0
-           st.session_state.failures = 0
-           st.session_state.reaction_times = []
-           st.session_state.best_reaction_time = None
-           st.experimental_rerun()
-           return  # 반드시 rerun 다음엔 return 해줘야 함!
+    if st.button("게임 시작하기"):
+        if not name or not name.strip():
+            st.warning("⚠️ 이름을 입력해주세요.")
+        else:
+            st.session_state.stage = 'playing'
+            st.session_state.waiting_for_click = False
+            st.session_state.attempts = 0
+            st.session_state.successes = 0
+            st.session_state.failures = 0
+            st.session_state.reaction_times = []
+            st.session_state.best_reaction_time = None
+            st.experimental_rerun()
+            return  # 반드시 rerun 다음엔 return 해줘야 함!
+
 
 
 
