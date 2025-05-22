@@ -2,14 +2,20 @@ import streamlit as st
 import random
 import time
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
-# 구글 시트 설정
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+# 구글 시트 인증 설정 (oauth2client → google-auth)
+scope = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+creds = Credentials.from_service_account_file("credentials.json", scopes=scope)
 client = gspread.authorize(creds)
+
+# 구글 시트 열기
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
-survey_sheet = sheet  # 하나의 스프레드시트를 사용
+survey_sheet = sheet  # 그대로 사용해도 됩니다
+
 
 # 초기 설정
 st.set_page_config(page_title="반응 속도 게임", layout="centered")
