@@ -9,7 +9,7 @@ scope = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
-creds = Credentials.from_service_account_file("credentials.json", scopes=scope)
+creds = Credentials.from_service_account_file("statistics-festival-89f832f3a671.json", scopes=scope)
 client = gspread.authorize(creds)
 
 # 구글 시트 열기
