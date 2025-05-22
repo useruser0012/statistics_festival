@@ -199,11 +199,4 @@ if st.button("게임 종료 및 설문조사"):
 st.write("---")
 st.write(f"현재 최고 기록: 💰 **{st.session_state.best_score}** 코인")
 
-st.write("### 게임 경고 메시지")
-st.write(
-    """
-    이 게임은 반응속도와 성공률이 일부 조작되어 있습니다.  
-    실제 도박처럼 중독성이 매우 강할 수 있으니 주의하세요!  
-    스스로 통제하지 못하면 큰 손해가 발생할 수 있습니다.
-    """
-)
+pip install google-api-python-client
