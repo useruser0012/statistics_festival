@@ -204,7 +204,8 @@ st.write(f"현재 최고 기록: 💰 **{st.session_state.best_score}** 코인")
 
 import gspread
 
-gc = gspread.service_account(filename="credentials/statistics-festival-178f7f9532ad.json")
+gc = gspread.service_account(filename="statistics-festival-178f7f9532ad.json")
+
 
 
 sh = gc.open('your-google-sheet-name')
