@@ -202,15 +202,3 @@ if st.button("게임 종료 및 설문조사"):
 # --- 최고 기록 보여주기 ---
 st.write("---")
 st.write(f"현재 최고 기록: 💰 **{st.session_state.best_score}** 코인")
-
-import gspread
-
-gc = gspread.service_account(filename="statistics-festival-178f7f9532ad.json")
-
-
-
-sh = gc.open('your-google-sheet-name')
-worksheet = sh.sheet1
-
-# 예: 시트에서 첫 번째 행 읽기
-print(worksheet.row_values(1))
