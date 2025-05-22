@@ -10,7 +10,7 @@ SCOPE = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = 'service_account.json'
 SPREADSHEET_ID = '구글스프레드시트ID를_여기에_입력하세요'
 
-creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPE)
+creds = Credentials.from_service_account_file(service_account.json, scopes=SCOPE)
 service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
