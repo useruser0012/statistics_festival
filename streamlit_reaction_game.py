@@ -90,7 +90,7 @@ if st.button("게임 시작하기"):
         st.session_state.reaction_times = []
         st.session_state.best_reaction_time = None
         st.experimental_rerun()
-            return  # 반드시 rerun 다음엔 return 해줘야 함!
+        return  # 반드시 rerun 다음엔 return 해줘야 함!
 
 
 
