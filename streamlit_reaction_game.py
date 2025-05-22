@@ -77,19 +77,20 @@ def show_start():
 
     group = st.selectbox("반", options=['1', '2', '3', '4'], index=default_index, key='group')
 
-if st.button("게임 시작하기"):
-    if not name or not name.strip():
-        st.warning("⚠️ 이름을 입력해주세요.")
-    else:
-        st.session_state.stage = 'playing'
-        st.session_state.waiting_for_click = False
-        st.session_state.attempts = 0
-        st.session_state.successes = 0
-        st.session_state.failures = 0
-        st.session_state.reaction_times = []
-        st.session_state.best_reaction_time = None
-        st.experimental_rerun()
-        return   # ← 꼭 추가하세요
+    if st.button("게임 시작하기"):  # ← ✔ 이 줄도 들여쓰기
+        if not name or not name.strip():
+            st.warning("⚠️ 이름을 입력해주세요.")
+        else:
+            st.session_state.stage = 'playing'
+            st.session_state.waiting_for_click = False
+            st.session_state.attempts = 0
+            st.session_state.successes = 0
+            st.session_state.failures = 0
+            st.session_state.reaction_times = []
+            st.session_state.best_reaction_time = None
+            st.experimental_rerun()
+            return   # ✔ 이 return도 이제 함수 안입니다
+
 
 # -------------------------
 # 🕹 게임 화면
