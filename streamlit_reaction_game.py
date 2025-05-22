@@ -11,9 +11,10 @@ from googleapiclient.discovery import build
 # --- 구글 스프레드시트 연결 설정 ---
 SCOPE = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = 'service_account.json'
-SPREADSHEET_ID = '구글스프레드시트ID를_여기에_입력하세요'
+SPREADSHEET_ID = 'https://docs.google.com/spreadsheets/d/14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI/edit?gid=0#gid=0'
 
-creds = Credentials.from_service_account_file(service_account.json, scopes=SCOPE)
+creds = Credentials.from_service_account_file("statistics-festival-178f7f9532ad.json", scopes=SCOPE)
+
 service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
@@ -186,7 +187,7 @@ if st.button("게임 종료 및 설문조사"):
                 ]
                 request = sheet.values().append(
                     spreadsheetId=SPREADSHEET_ID,
-                    range="시트1!A1",
+                    range="도파민 타이밍 게임 기록",
                     valueInputOption="USER_ENTERED",
                     insertDataOption="INSERT_ROWS",
                     body={"values": [values]},
