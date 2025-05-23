@@ -14,7 +14,6 @@ SERVICE_ACCOUNT_FILE = 'statistics-festival-178f7f9532ad.json'
 SPREADSHEET_ID = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
 
 creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPE)
-
 service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
@@ -98,16 +97,15 @@ time_factor = class_settings[st.session_state.class_num]["time_factor"]
 def is_success_with_pattern(try_num):
     if st.session_state.class_num not in [2, 3]:
         return random.random() < success_rate
-    # 2,3반: 초반은 성공 유도, 중반부터 실패 증가 후 끝 무렵 성공 소량
-    total = 30  # 예시 시도 총 횟수 (필요하면 더 키울 수 있음)
+    total = 30  # 예시 시도 총 횟수
     if try_num < total * 0.3:
         return True
     elif try_num < total * 0.7:
-        return random.random() < 0.4  # 실패 높임
+        return random.random() < 0.4
     elif try_num < total * 0.85:
-        return False  # 연속 실패
+        return False
     else:
-        return random.random() < 0.3  # 끝에 약간 성공
+        return random.random() < 0.3
 
 # --- 실패 멘트 랜덤 ---
 def get_fail_message(diff_sec):
@@ -118,37 +116,30 @@ def get_fail_message(diff_sec):
 if st.button("시도하기 (반응 속도 맞추기)"):
     st.session_state.tries += 1
 
-    # 반응 시간 측정 시뮬레이션 (실제는 키 입력 등으로 구현 가능)
-    base_time = random.uniform(0.5, 2.0)  # 예: 0.5~2초 반응
+    base_time = random.uniform(0.5, 2.0)
     adjusted_time = base_time * time_factor
 
-    # 성공 여부 판단
     success = is_success_with_pattern(st.session_state.tries)
     coin_change = 0
 
     if success:
-        # 성공: 코인 증가 (5~100 사이 랜덤)
         coin_change = random.randint(SUCCESS_COIN_MIN, SUCCESS_COIN_MAX)
         st.session_state.successes += 1
         st.session_state.coins += coin_change
         st.success(f"🎉 성공! 반응 시간: {adjusted_time:.2f}초 (조작됨)")
         st.info(f"💰 코인 +{coin_change} 획득! 현재 코인: {st.session_state.coins}")
     else:
-        # 실패: 코인 감소 (10~130 사이 랜덤)
         coin_change = -random.randint(FAIL_COIN_MIN, FAIL_COIN_MAX)
         st.session_state.failures += 1
         st.session_state.coins += coin_change
-        # 실패 시간 차이 랜덤 (0.01~0.15초)
         diff_sec = random.uniform(0.01, 0.15)
         fail_msg = get_fail_message(diff_sec)
         st.error(f"❌ {fail_msg}")
         st.info(f"💰 코인 {coin_change} 감소. 현재 코인: {st.session_state.coins}")
 
-    # 최고 기록 갱신
     if st.session_state.coins > st.session_state.best_score:
         st.session_state.best_score = st.session_state.coins
 
-    # 시도 결과 저장 (시간, 성공 여부, 코인 증감량)
     st.session_state.results.append({
         "try": st.session_state.tries,
         "success": success,
@@ -173,7 +164,6 @@ if st.button("게임 종료 및 설문조사"):
         survey_submitted = st.form_submit_button("결과 제출 및 저장")
 
         if survey_submitted:
-            # 구글 스프레드시트에 저장
             try:
                 values = [
                     st.session_state.user_name,
@@ -203,27 +193,8 @@ if st.button("게임 종료 및 설문조사"):
 st.write("---")
 st.write(f"현재 최고 기록: 💰 **{st.session_state.best_score}** 코인")
 
-import os
-
-SERVICE_ACCOUNT_FILE = 'statistics-festival-178f7f9532ad.json'
-
-print("현재 디렉토리:", os.getcwd())
-print("파일 존재 여부:", os.path.isfile(SERVICE_ACCOUNT_FILE))
-
-try:
-    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPE)
-    print("인증 성공!")
-except Exception as e:
-    print("인증 실패:", str(e))
-
-import os
-
-home_dir = os.environ["USERPROFILE"]
-creds_path = os.path.join(home_dir, "credentials.json")
-
-            except Exception as e:
-                st.error(f"데이터 저장 중 오류가 발생했습니다: {e}")
-
+# --- 처음으로 돌아가기 버튼 ---
 if st.button("처음으로 돌아가기"):
     st.session_state.clear()
     st.experimental_rerun()
+
