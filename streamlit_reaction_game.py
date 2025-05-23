@@ -216,3 +216,7 @@ try:
 except Exception as e:
     print("인증 실패:", str(e))
 
+import os
+
+home_dir = os.environ["USERPROFILE"]
+creds_path = os.path.join(home_dir, "credentials.json")
