@@ -1,3 +1,4 @@
+import streamlit as st
 import os
 
 st.write("현재 작업 디렉토리:", os.getcwd())
