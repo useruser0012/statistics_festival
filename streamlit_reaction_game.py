@@ -1,5 +1,11 @@
-import streamlit as st
-import os
+import gspread
+from google.oauth2.service_account import Credentials
 
-st.write("현재 작업 디렉토리:", os.getcwd())
-st.write("현재 디렉토리 파일 목록:", os.listdir())
+SERVICE_ACCOUNT_FILE = "/mount/src/statistics_festival/service_account.json"
+
+credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=[
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+])
+
+gc = gspread.authorize(credentials)
