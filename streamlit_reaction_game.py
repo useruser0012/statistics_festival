@@ -1,11 +1,7 @@
-import gspread
-from google.oauth2.service_account import Credentials
+import json
 
-SERVICE_ACCOUNT_FILE = "/mount/src/statistics_festival/service_account.json"
+with open('/mount/src/statistics_festival/service_account.json', 'r') as f:
+    data = json.load(f)
 
-credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=[
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive'
-])
-
-gc = gspread.authorize(credentials)
+print(data['private_key'])
+print(repr(data['private_key']))  # 문자열 내부에 \n이 어떻게 들어있는지 출력
