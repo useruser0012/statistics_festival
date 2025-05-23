@@ -1,5 +1,6 @@
 import json
 
-with open("service_account.json", "r", encoding="utf-8") as f:
+with open('service_account.json', 'r') as f:
     data = json.load(f)
-    print(data["private_key"])
+
+print(data['private_key'])
