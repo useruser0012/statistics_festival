@@ -205,5 +205,14 @@ st.write(f"현재 최고 기록: 💰 **{st.session_state.best_score}** 코인")
 
 import os
 
-print("현재 경로:", os.getcwd())
-print("인증 파일 존재 여부:", os.path.isfile(SERVICE_ACCOUNT_FILE))
+SERVICE_ACCOUNT_FILE = 'statistics-festival-178f7f9532ad.json'
+
+print("현재 디렉토리:", os.getcwd())
+print("파일 존재 여부:", os.path.isfile(SERVICE_ACCOUNT_FILE))
+
+try:
+    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPE)
+    print("인증 성공!")
+except Exception as e:
+    print("인증 실패:", str(e))
+
