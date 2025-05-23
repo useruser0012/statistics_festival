@@ -3,5 +3,7 @@ import json
 with open('/mount/src/statistics_festival/service_account.json', 'r') as f:
     data = json.load(f)
 
-print(data['private_key'])
-print(repr(data['private_key']))  # 문자열 내부에 \n이 어떻게 들어있는지 출력
+print("private_key 일부:")
+print(data['private_key'][:50])  # private_key 앞부분만 출력
+print("repr로 확인:")
+print(repr(data['private_key'][:50]))
