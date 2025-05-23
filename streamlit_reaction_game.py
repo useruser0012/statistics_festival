@@ -220,3 +220,10 @@ import os
 
 home_dir = os.environ["USERPROFILE"]
 creds_path = os.path.join(home_dir, "credentials.json")
+
+            except Exception as e:
+                st.error(f"데이터 저장 중 오류가 발생했습니다: {e}")
+
+if st.button("처음으로 돌아가기"):
+    st.session_state.clear()
+    st.experimental_rerun()
