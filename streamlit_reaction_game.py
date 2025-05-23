@@ -1,9 +1,10 @@
-import json
+import gspread
+from google.oauth2.service_account import Credentials
 
-with open('/mount/src/statistics_festival/service_account.json', 'r') as f:
-    data = json.load(f)
+SERVICE_ACCOUNT_FILE = "/mount/src/statistics_festival/service_account.json"
+credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=[
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+])
 
-print("private_key 일부:")
-print(data['private_key'][:50])  # private_key 앞부분만 출력
-print("repr로 확인:")
-print(repr(data['private_key'][:50]))
+gc = gspread.authorize(credentials)  # 여기서 인증 시도됨
