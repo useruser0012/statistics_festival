@@ -1,6 +1,13 @@
-import json
+[gspread]
+type = "service_account"
+project_id = "statistics-festival"
+private_key_id = "e897b3fcf517ed85da15e71ccd2b6fe31d9291db"
+private_key = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQD5FS+GlMpbkhIv\nRzCQuVRLb9FVPZu9+S1iHcKOHHnSuWoHN2/QNdBGT+KyugJcAiNChX7LVlMD9PBP\naItt1JflgSVAsqEk1bKnrKgKuGPNMgs8Kxg6CB9MLkaAta5A66wBryyQ5hfQccqi\nzLu9hH5LWoQEYjGO798y8b2wfukiYhZFbJ1w/hlZk29MtzSRyYYwpARUitrScSHH\n4v1uraOyXycRbEY5SGiMeqiZEvB3eCORP+MXZgNR1x5Yh7MtflxnfUKDmzmN7WSy\nhJejaGko3zxaJYL24L/fp5UazUvC8hnH3nc6MWmg2LQaYpdiqpYo7df9miLc/IPo\ndmZjb+HdAgMBAAECggEAC4PCNbDX21HZC1x5efHyBqa9q6N0eVzKj02cOoubH3W4\n2WqOUwwZ0RZM/uwrGGvKNioLtC9ibmgQBUEU/lfPSdR65LnH9KGjEligpWuOxDlQ\nXFC1savByU4eWOw33lfGv4aEmJI6fvAJE8Duhj1YxU0C61z1Y4vilUKoUpTGBvPL\nMI4Gl7IYCWTHV1SR5b0t0tMRUIlJIZAWX/noIL6cVOuqwLUPU+uNr+RwJD8Tk+S1\ngf/C0akPuWJoGkZsXDXL2BZe5hIuE0e8T3G1Fp+aqHV7DraK12ZCJlGxofUB7lGf\nOGv2Ugb1oyoiyq1mKdZC6xwu833BZFCcS6GCIBt7tQKBgQD/HbtXWuukIA1bnTUo\nj7yO0NuZMgY9i3izEidKy07ayFmF2TM3Lq4DK7Tq9A+t8+1pclj9jFimCQL8NFB2\nB0gQ+nfWgFq4RRVdbF8n6TfqlZ5fGfXQIYHAg3njYxff0wnHDAq+salD3GLxI9Hw\n/iAtNpEQhOVK8JU27lT5b9lxNwKBgQD58hpKwdOAZL7wKL3aINRckvD+a3H37Y2p\nJhdlsK/Ilmz4Th+mb1Wer6eSfi6CZYyUizvGo0G/qJTqgzQAn59DsKhVsjZEt5R+\nNBcjtSx4mUTnmXMjIspuprDITtlmIrNE9PXSyOxyT9gXrIAvtbUEecaJekfESS6N\nFyh1oYRfiwKBgCo3ZFH/VLEzMKKxcCOHLZ/AhiZitc+nbdDMNz5USHdB4jaZC7Wc\n/uS9bdHXk2So0ee6KWnDuMO5CApuKcZuTAmrOPuBAAIwRGnSTijPmhYyriN0q03G\nza7q0tfDBSdfx+VtY7XMtoLpTGI1GD+1/eMdfYHrS/pLt5WAeQVR8fyfAoGATK8t\nx9/dzxeZyT8GuIS4AssGa1h1t/ZHLy1DomxqEiWsuyXk6gBgiXYk+HoENPeJAQ4S\nwefWxUGopqaobsSKbY8mplwt8DlOssWyj78HLN0BWfknbRFAgGBd/qbKZl6hF7f8\nL7Z7bLr4dpLzJTAfoIboFcfRevRk9t6zCBwM6+8CgYEAq7Z0zb5J0EZNQn/L/jan\ny+Lo4PlyJUl06WgYpSlTdox8nIkm+6HFpdLhjFI48xXUSZFc8lRu3H1fsRUoQBNY\n7FYTg/It1GpEmhgw9aoIo63Km0Mrs3UI0ALrE75rdX2kK6YsCujcFVGtAB60yqzk\n4EpZp6qFK8QncyoJaC810Po=\n-----END PRIVATE KEY-----\n"
+client_email = "service-account@statistics-festival.iam.gserviceaccount.com"
+client_id = "113896197954020553548"
+auth_uri = "https://accounts.google.com/o/oauth2/auth"
+token_uri = "https://oauth2.googleapis.com/token"
+auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+client_x509_cert_url = "https://www.googleapis.com/robot/v1/metadata/x509/service-account%40statistics-festival.iam.gserviceaccount.com"
 
-with open('service_account.json', 'r') as f:
-    data = json.load(f)
-
-print(data['private_key'])
+json_data["private_key"].replace("\n", "\\n")
