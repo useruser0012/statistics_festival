@@ -110,26 +110,26 @@ elif st.session_state.page == "game":
                 # 성공 확률 계산
                 success_prob = get_success_probability(reaction_time)
 
-                if reaction_time < 0.1:
-                    # 너무 빠름
-                    st.warning("너무 빨리 클릭하셨습니다! 실패로 처리됩니다.")
-                    st.session_state.failures += 1
-                    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                    st.session_state.coins -= coin_loss
-                    st.session_state.result_message = f"너무 빠른 클릭으로 실패! 코인 {coin_loss}개 손실."
-                else:
-                    if random.random() <= success_prob:
-                        st.success(f"성공! 조작된 반응 시간: {reaction_time:.2f}초, 성공 확률: {success_prob:.2f}")
-                        st.session_state.successes += 1
-                        coin_gain = random.randint(30, 100)
-                        st.session_state.coins += coin_gain
-                        st.session_state.result_message = f"코인 {coin_gain}개 획득!"
-                    else:
-                        st.error(f"실패... 조작된 반응 시간: {reaction_time:.2f}초, 성공 확률: {success_prob:.2f}")
-                        st.session_state.failures += 1
-                        coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                        st.session_state.coins -= coin_loss
-                        st.session_state.result_message = f"코인 {coin_loss}개 손실."
+               if reaction_time < 0.1:
+    st.warning("너무 빨리 클릭하셨습니다! 실패로 처리됩니다.")
+    st.session_state.failures += 1
+    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+    st.session_state.coins -= coin_loss
+    st.session_state.result_message = f"너무 빠른 클릭으로 실패! 코인 {coin_loss}개 손실."
+else:
+    if random.random() <= success_prob:
+        st.success("성공했습니다!")
+        st.session_state.successes += 1
+        coin_gain = random.randint(30, 100)
+        st.session_state.coins += coin_gain
+        st.session_state.result_message = f"코인 {coin_gain}개 획득!"
+    else:
+        st.error("실패했습니다.")
+        st.session_state.failures += 1
+        coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+        st.session_state.coins -= coin_loss
+        st.session_state.result_message = f"코인 {coin_loss}개 손실."
+
 
                 if st.session_state.coins < 0:
                     st.session_state.coins = 0
