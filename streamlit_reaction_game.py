@@ -39,33 +39,30 @@ class_settings = {
 }
 
 # --- Streamlit 상태변수 초기화 ---
-if "game_in_progress" not in st.session_state:
-    st.session_state.game_in_progress = False
-if "waiting_for_click" not in st.session_state:
-    st.session_state.waiting_for_click = False
-if "tries" not in st.session_state:
-    st.session_state.tries = 0
-if "successes" not in st.session_state:
-    st.session_state.successes = 0
-if "failures" not in st.session_state:
-    st.session_state.failures = 0
-if "coins" not in st.session_state:
-    st.session_state.coins = 10  # 초기 코인 10으로 설정
-if "start_time" not in st.session_state:
-    st.session_state.start_time = 0
-if "class_num" not in st.session_state:
-    st.session_state.class_num = 1
-if "user_name" not in st.session_state:
+if 'user_name' not in st.session_state:
     st.session_state.user_name = ""
+if 'class_num' not in st.session_state:
+    st.session_state.class_num = 1
+if 'tries' not in st.session_state:
+    st.session_state.tries = 0
+if 'successes' not in st.session_state:
+    st.session_state.successes = 0
+if 'failures' not in st.session_state:
+    st.session_state.failures = 0
+if 'coins' not in st.session_state:
+    st.session_state.coins = 10  # 초기 코인 10개
+if 'game_in_progress' not in st.session_state:
+    st.session_state.game_in_progress = False
+if 'waiting_for_click' not in st.session_state:
+    st.session_state.waiting_for_click = False
+if 'start_time' not in st.session_state:
+    st.session_state.start_time = 0
 
 # --- UI ---
 st.title("도파민 타이밍 게임")
 
-user_name = st.text_input("이름을 입력하세요", st.session_state.user_name)
-class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num - 1)
-
-st.session_state.user_name = user_name
-st.session_state.class_num = class_num
+user_name = st.text_input("이름을 입력하세요", key='user_name')
+class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), key='class_num')
 
 success_rate = class_settings[class_num]["success_rate"]
 time_factor = class_settings[class_num]["time_factor"]
@@ -80,11 +77,9 @@ def calculate_failure_coin_loss(tries):
     max_loss = 120
     max_tries_for_max_loss = 100  # 100번 시도 시 최대 손실
 
-    # tries가 max_tries_for_max_loss 이상이면 최대 손실
     if tries >= max_tries_for_max_loss:
-        return random.randint(90, max_loss)  # 최대치 가까운 값에서 랜덤
+        return random.randint(90, max_loss)
     else:
-        # 선형 보간
         loss_min = min_loss + (max_loss - min_loss) * (tries / max_tries_for_max_loss)
         loss_max = 50 + (max_loss - 50) * (tries / max_tries_for_max_loss)
         return random.randint(int(loss_min), int(loss_max))
@@ -93,7 +88,7 @@ def reset_game():
     st.session_state.tries = 0
     st.session_state.successes = 0
     st.session_state.failures = 0
-    st.session_state.coins = 10  # 초기 코인 다시 10으로
+    st.session_state.coins = 10
     st.session_state.game_in_progress = False
     st.session_state.waiting_for_click = False
     st.session_state.start_time = 0
@@ -109,13 +104,12 @@ def stop_game():
     st.write("게임이 중단되었습니다.")
 
 def game_loop():
-    # 항상 상태 정보 표시
     st.markdown(f"**총 도전 횟수:** {st.session_state.tries}  |  **성공 횟수:** {st.session_state.successes}  |  **실패 횟수:** {st.session_state.failures}  |  **현재 코인:** {st.session_state.coins}")
 
     if st.session_state.waiting_for_click:
         if st.button("지금 클릭!"):
             reaction_time = time.time() - st.session_state.start_time
-            if reaction_time < 0.1:  # 너무 빠른 클릭 무효
+            if reaction_time < 0.1:
                 st.warning("너무 빨리 클릭하셨습니다! 실패로 처리됩니다.")
                 st.session_state.failures += 1
                 coin_loss = calculate_failure_coin_loss(st.session_state.tries)
@@ -137,7 +131,6 @@ def game_loop():
                     st.write(f"코인 {coin_loss}개를 잃었습니다.")
                 st.session_state.waiting_for_click = False
 
-            # 코인 음수 방지
             if st.session_state.coins < 0:
                 st.session_state.coins = 0
 
@@ -201,13 +194,33 @@ if st.button("설문 제출"):
                 q4
             ]
             request = sheet.values().append(
+                spreadsheetId=SPREAD
+if st.button("설문 제출"):
+    if not st.session_state.user_name:
+        st.warning("이름을 입력해 주세요.")
+    else:
+        try:
+            values = [
+                st.session_state.user_name,
+                st.session_state.class_num,
+                st.session_state.tries,
+                st.session_state.successes,
+                st.session_state.failures,
+                st.session_state.coins,
+                str(datetime.datetime.now()),
+                q1,
+                q2,
+                q3,
+                q4
+            ]
+            request = sheet.values().append(
                 spreadsheetId=SPREADSHEET_ID,
-                range="도파민 타이밍 게임 기록",
+                range="Sheet1!A1",  # 시트 이름과 범위 조정 필요
                 valueInputOption="USER_ENTERED",
                 insertDataOption="INSERT_ROWS",
-                body={"values": [values]},
+                body={"values": [values]}
             )
-            request.execute()
-            st.success("데이터가 성공적으로 저장되었습니다! 감사합니다.")
+            response = request.execute()
+            st.success("설문이 성공적으로 제출되었습니다. 참여해 주셔서 감사합니다!")
         except Exception as e:
-            st.error(f"데이터 저장 중 오류가 발생했습니다: {e}")
+            st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
