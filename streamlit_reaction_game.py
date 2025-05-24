@@ -1,11 +1,9 @@
-import streamlit as st
 from google.oauth2.service_account import Credentials
+import gspread
 
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 
-try:
-    creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
-    st.success("Credentials loaded successfully")
-except Exception as e:
-    st.error(f"Credentials error: {e}")
+creds = Credentials.from_service_account_file('statistics-festival-6037ec1a564b.json', scopes=scope)
+client = gspread.authorize(creds)
 
+sheet = client.open("설문지 제목").sheet1
