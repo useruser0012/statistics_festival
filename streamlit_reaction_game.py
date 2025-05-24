@@ -89,15 +89,10 @@ elif st.session_state.page == "game":
     st.write(f"{user_name}님, {class_num}반 게임 중입니다.")
     st.write(f"총 시도: {st.session_state.tries} | 성공: {st.session_state.successes} | 실패: {st.session_state.failures} | 코인: {st.session_state.coins}")
 
-    # 게임 종료 버튼
-    if st.button("게임 종료 후 설문조사"):
-        st.session_state.page = "survey"
-
     # 결과 메시지 출력
     if st.session_state.result_message:
         st.markdown(st.session_state.result_message)
 
-    # 게임 진행 로직
     now = time.time()
 
     if st.session_state.waiting_for_click:
@@ -148,12 +143,14 @@ elif st.session_state.page == "game":
                 st.session_state.waiting_for_click = True
                 st.session_state.result_message = ""
 
-                # 클릭할 수 있는 시간은 1~3초 뒤 랜덤으로 설정 (사용자가 버튼 기다림)
-                delay = random.uniform(1.0, 3.0)
+                # 클릭할 수 있는 시간은 0.5~1.5초 뒤 랜덤으로 설정 (기존 1~3초에서 줄임)
+                delay = random.uniform(0.5, 1.5)
                 st.session_state.next_click_time = time.time() + delay
-
-                # 클릭 반응 시간 측정 시작 시점은 next_click_time부터
                 st.session_state.reaction_start_time = st.session_state.next_click_time
+
+            # '게임 종료 후 설문조사' 버튼을 여기 위치시킴
+            if st.button("게임 종료 후 설문조사"):
+                st.session_state.page = "survey"
 
 elif st.session_state.page == "survey":
     st.title("설문조사")
