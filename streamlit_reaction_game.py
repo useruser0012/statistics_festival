@@ -161,15 +161,29 @@ elif st.session_state.page == "survey":
     st.title("설문조사")
     st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
 
-    # 설문 내용 예시
-    q1 = st.radio("게임 난이도는 어땠나요?", ["쉬움", "적당함", "어려움"])
-    q2 = st.text_area("게임을 하면서 느낀 점이나 개선할 점을 적어 주세요.")
+    q1 = st.radio("게임의 흥미도는 어땠나요?", options=["매우 흥미로움", "흥미로움", "보통", "흥미롭지 않음"])
+    q2 = st.radio("게임이 공정하다고 느꼈나요?", options=["매우 공정함", "공정함", "보통", "공정하지 않음"])
+    q3 = st.radio("게임 중 충동을 느꼈나요?", options=["매우 충동적임", "충동적임", "보통", "충동적이지 않음"])
+    q4 = st.text_area("비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
 
     if st.button("설문 제출"):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data = [now_str, st.session_state.user_name, st.session_state.class_num, st.session_state.tries,
-                st.session_state.successes, st.session_state.failures, st.session_state.coins,
-                q1, q2]
+        data = [now_str, st.session_state.user_name, st.session_state.class_num,
+                st.session_state.tries, st.session_state.successes,
+                st.session_state.failures, st.session_state.coins,
+                q1, q2, q3, q4]
+
+        try:
+            sheet.append_row(data)
+            st.success("설문이 제출되었습니다! 감사합니다.")
+        except Exception as e:
+            st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
+
+        # 초기화
+        st.session_state.page = "start"
+        st.session_state.user_name = ""
+        st.session_state.class_num = 1
+
 
         try:
             sheet.append_row(data)
