@@ -95,7 +95,7 @@ elif st.session_state.page == "game":
 
     now = time.time()
 
-    if st.session_state.waiting_for_click:
+if st.session_state.waiting_for_click:
     if now >= st.session_state.next_click_time:
         if st.button("지금 클릭!"):
             raw_reaction_time = time.time() - st.session_state.reaction_start_time
