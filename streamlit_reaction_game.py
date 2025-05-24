@@ -1,4 +1,4 @@
-import sy
+import sys
 print("Streamlit app Python executable:", sys.executable)
 
 import streamlit as st
