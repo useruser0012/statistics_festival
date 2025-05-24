@@ -101,10 +101,8 @@ elif st.session_state.page == "game":
             raw_reaction_time = time.time() - st.session_state.reaction_start_time
             reaction_time = raw_reaction_time * time_factor
 
-            # 반응시간 화면에 표시
             st.write(f"반응시간: {reaction_time:.3f}초")
 
-            # 성공 기준 설정 (예: 0.2초 이상 1.5초 이하가 성공)
             if reaction_time < 0.2:
                 st.warning("너무 빨리 클릭하셨습니다! 실패로 처리됩니다.")
                 st.session_state.failures += 1
@@ -118,7 +116,6 @@ elif st.session_state.page == "game":
                 st.session_state.coins -= coin_loss
                 st.session_state.result_message = f"너무 늦은 클릭으로 실패! 코인 {coin_loss}개 손실."
             else:
-                # 성공
                 st.success("성공했습니다!")
                 st.session_state.successes += 1
                 coin_gain = random.randint(30, 100)
@@ -126,35 +123,27 @@ elif st.session_state.page == "game":
                 st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
 
             st.session_state.waiting_for_click = False
-
     else:
         st.write("잠시 기다려 주세요...")
 
-
+else:
+    if st.session_state.tries >= 1000:
+        st.write("최대 시도 횟수에 도달했습니다.")
+        st.session_state.page = "survey"
     else:
-        # 다음 시도 준비 버튼
-        if st.session_state.tries >= 1000:
-            st.write("최대 시도 횟수에 도달했습니다.")
+        if st.button("다음 시도 시작"):
+            st.session_state.tries += 1
+            st.session_state.waiting_for_click = True
+            st.session_state.result_message = ""
+
+            delay = random.uniform(0.5, 1.5)
+            st.session_state.next_click_time = time.time() + delay
+            st.session_state.reaction_start_time = st.session_state.next_click_time
+
+        # '게임 종료 후 설문조사' 버튼을 다음 시도 시작 버튼 아래에 둠
+        if st.button("게임 종료 후 설문조사"):
             st.session_state.page = "survey"
-        else:
-            if st.button("다음 시도 시작"):
-                st.session_state.tries += 1
-                st.session_state.waiting_for_click = True
-                st.session_state.result_message = ""
 
-                # 딜레이를 0.5초 ~ 1.5초 사이로 설정
-                delay = random.uniform(0.5, 1.5)
-                st.session_state.next_click_time = time.time() + delay
-                st.session_state.reaction_start_time = st.session_state.next_click_time
-
-                # 클릭할 수 있는 시간은 0.5~1.5초 뒤 랜덤으로 설정 (기존 1~3초에서 줄임)
-                delay = random.uniform(0.5, 1.5)
-                st.session_state.next_click_time = time.time() + delay
-                st.session_state.reaction_start_time = st.session_state.next_click_time
-
-            # '게임 종료 후 설문조사' 버튼을 여기 위치시킴
-            if st.button("게임 종료 후 설문조사"):
-                st.session_state.page = "survey"
 
 elif st.session_state.page == "survey":
     st.title("설문조사")
