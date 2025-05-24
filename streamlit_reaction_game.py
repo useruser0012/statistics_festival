@@ -8,7 +8,7 @@ from googleapiclient.discovery import build
 
 # --- 구글 스프레드시트 설정 ---
 SCOPE = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'statistics-festival-178f7f9532ad.json'  # 서비스 계정 JSON 파일 경로
+SERVICE_ACCOUNT_FILE = 'statistics-festival-6037ec1a564b.json'   # 서비스 계정 JSON 파일 경로
 SPREADSHEET_ID = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
 
 # 서비스 계정 파일 존재 확인
