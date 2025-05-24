@@ -2,27 +2,15 @@ import streamlit as st
 import random
 import time
 import datetime
-import os
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
 
-# --- 구글 스프레드시트 설정 ---
-SCOPE = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'statistics-festival-6037ec1a564b.json'   # 서비스 계정 JSON 파일 경로
-SPREADSHEET_ID = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
-# 서비스 계정 파일 존재 확인
-if not os.path.isfile(SERVICE_ACCOUNT_FILE):
-    st.error(f"서비스 계정 인증 파일이 없습니다: {SERVICE_ACCOUNT_FILE}")
-    st.stop()
-
-try:
-    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPE)
-    service = build('sheets', 'v4', credentials=creds)
-    sheet = service.spreadsheets()
-except Exception as e:
-    st.error(f"구글 인증 또는 서비스 빌드 실패: {e}")
-    st.stop()
+# --- 구글 스프레드시트 설정 (gspread 방식) ---
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('statistics-festival-6037ec1a564b.json', scope)
+client = gspread.authorize(creds)
+sheet = client.open("설문지 제목").sheet1  # 실제 시트 이름으로 바꾸세요
 
 # --- 클래스별 성공률 및 시간 조작 비율 설정 (1~10반) ---
 class_settings = {
@@ -50,7 +38,7 @@ if 'successes' not in st.session_state:
 if 'failures' not in st.session_state:
     st.session_state.failures = 0
 if 'coins' not in st.session_state:
-    st.session_state.coins = 10  # 초기 코인 10개
+    st.session_state.coins = 10
 if 'game_in_progress' not in st.session_state:
     st.session_state.game_in_progress = False
 if 'waiting_for_click' not in st.session_state:
@@ -69,14 +57,9 @@ time_factor = class_settings[class_num]["time_factor"]
 
 # --- 코인 손실 계산 함수 ---
 def calculate_failure_coin_loss(tries):
-    """
-    시도 횟수에 따라 실패 시 잃는 코인 수 증가.
-    30~50에서 시작해 최대 120까지 선형 증가.
-    """
     min_loss = 30
     max_loss = 120
-    max_tries_for_max_loss = 100  # 100번 시도 시 최대 손실
-
+    max_tries_for_max_loss = 100
     if tries >= max_tries_for_max_loss:
         return random.randint(90, max_loss)
     else:
@@ -179,28 +162,22 @@ if st.button("설문 제출"):
     if not st.session_state.user_name:
         st.warning("이름을 입력해 주세요.")
     else:
+        values = [
+            st.session_state.user_name,
+            st.session_state.class_num,
+            st.session_state.tries,
+            st.session_state.successes,
+            st.session_state.failures,
+            st.session_state.coins,
+            str(datetime.datetime.now()),
+            q1,
+            q2,
+            q3,
+            q4
+        ]
+        
         try:
-            values = [
-                st.session_state.user_name,
-                st.session_state.class_num,
-                st.session_state.tries,
-                st.session_state.successes,
-                st.session_state.failures,
-                st.session_state.coins,
-                str(datetime.datetime.now()),
-                q1,
-                q2,
-                q3,
-                q4
-            ]
-            request = sheet.values().append(
-                spreadsheetId=SPREADSHEET_ID,
-
-                range="도파민 타이밍 게임 기록",
-                valueInputOption="USER_ENTERED",
-                insertDataOption="INSERT_ROWS",
-                body={"values": [values]}
-            ).execute()
+            sheet.append_row(values)
             st.success("설문이 성공적으로 제출되었습니다!")
         except Exception as e:
             st.error(f"설문 제출 실패: {e}")
