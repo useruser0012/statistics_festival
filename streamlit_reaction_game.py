@@ -110,7 +110,7 @@ elif st.session_state.page == "game":
                 # 성공 확률 계산
                 success_prob = get_success_probability(reaction_time)
 
- if reaction_time < 0.1:
+if reaction_time < 0.1:
     st.warning("너무 빨리 클릭하셨습니다! 실패로 처리됩니다.")
     st.session_state.failures += 1
     coin_loss = calculate_failure_coin_loss(st.session_state.tries)
