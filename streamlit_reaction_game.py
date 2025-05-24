@@ -194,28 +194,8 @@ if st.button("설문 제출"):
                 q4
             ]
             request = sheet.values().append(
-                SPREADSHEET_ID = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
-
-if st.button("설문 제출"):
-    if not st.session_state.user_name:
-        st.warning("이름을 입력해 주세요.")
-    else:
-        try:
-            values = [
-                st.session_state.user_name,
-                st.session_state.class_num,
-                st.session_state.tries,
-                st.session_state.successes,
-                st.session_state.failures,
-                st.session_state.coins,
-                str(datetime.datetime.now()),
-                q1,
-                q2,
-                q3,
-                q4
-            ]
-            sheet.values().append(
                 spreadsheetId=SPREADSHEET_ID,
+
                 range="도파민 타이밍 게임 기록",
                 valueInputOption="USER_ENTERED",
                 insertDataOption="INSERT_ROWS",
