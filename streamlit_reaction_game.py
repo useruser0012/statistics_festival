@@ -125,8 +125,8 @@ elif st.session_state.page == "game":
                         st.session_state.coins -= coin_loss
                         st.session_state.result_message = f"코인 {coin_loss}개 손실."
 
-                if st.session_state.coins < 0:
-                    st.session_state.coins = 0
+               # if st.session_state.coins < 0:
+                #    st.session_state.coins = 0
 
                 st.session_state.waiting_for_click = False
         else:
