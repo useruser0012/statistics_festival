@@ -215,11 +215,14 @@ if st.button("설문 제출"):
             ]
             request = sheet.values().append(
                 spreadsheetId=SPREADSHEET_ID,
-                range="Sheet1!A1",  # 시트 이름과 범위 조정 필요
-                valueInputOption="USER_ENTERED",
-                insertDataOption="INSERT_ROWS",
-                body={"values": [values]}
-            )
+              request = sheet.values().append(
+    spreadsheetId=SPREADSHEET_ID,
+    range="도파민 타이밍 게임 기록",
+    valueInputOption="USER_ENTERED",
+    insertDataOption="INSERT_ROWS",
+    body={"values": [values]}
+)
+
             response = request.execute()
             st.success("설문이 성공적으로 제출되었습니다. 참여해 주셔서 감사합니다!")
         except Exception as e:
