@@ -95,36 +95,34 @@ def game_loop():
     st.markdown(f"**총 도전 횟수:** {st.session_state.tries}  |  **성공 횟수:** {st.session_state.successes}  |  **실패 횟수:** {st.session_state.failures}  |  **현재 코인:** {st.session_state.coins}")
 
     if st.session_state.waiting_for_click:
-    if st.button("지금 클릭!"):
-        raw_reaction_time = time.time() - st.session_state.start_time
-        # 클래스별 시간 조작 비율 적용
-        reaction_time = raw_reaction_time * time_factor
+        if st.button("지금 클릭!"):
+            raw_reaction_time = time.time() - st.session_state.start_time
+            reaction_time = raw_reaction_time * time_factor
 
-        if reaction_time < 0.1:
-            st.warning("너무 빨리 클릭하셨습니다! 실패로 처리됩니다.")
-            st.session_state.failures += 1
-            coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-            st.session_state.coins -= coin_loss
-            st.write(f"코인 {coin_loss}개를 잃었습니다.")
-            st.session_state.waiting_for_click = False
-        else:
-            if random.random() <= success_rate:
-                st.success(f"성공! 반응 시간: {reaction_time:.2f}초")
-                st.session_state.successes += 1
-                coin_gain = random.randint(30, 100)
-                st.session_state.coins += coin_gain
-                st.write(f"코인 {coin_gain}개를 획득했습니다!")
-            else:
-                st.error(f"실패... 반응 시간: {reaction_time:.2f}초")
+            if reaction_time < 0.1:
+                st.warning("너무 빨리 클릭하셨습니다! 실패로 처리됩니다.")
                 st.session_state.failures += 1
                 coin_loss = calculate_failure_coin_loss(st.session_state.tries)
                 st.session_state.coins -= coin_loss
                 st.write(f"코인 {coin_loss}개를 잃었습니다.")
-            st.session_state.waiting_for_click = False
+                st.session_state.waiting_for_click = False
+            else:
+                if random.random() <= success_rate:
+                    st.success(f"성공! 반응 시간: {reaction_time:.2f}초")
+                    st.session_state.successes += 1
+                    coin_gain = random.randint(30, 100)
+                    st.session_state.coins += coin_gain
+                    st.write(f"코인 {coin_gain}개를 획득했습니다!")
+                else:
+                    st.error(f"실패... 반응 시간: {reaction_time:.2f}초")
+                    st.session_state.failures += 1
+                    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+                    st.session_state.coins -= coin_loss
+                    st.write(f"코인 {coin_loss}개를 잃었습니다.")
+                st.session_state.waiting_for_click = False
 
-        if st.session_state.coins < 0:
-            st.session_state.coins = 0
-
+            if st.session_state.coins < 0:
+                st.session_state.coins = 0
 
     else:
         if st.session_state.tries < 1000:
@@ -133,6 +131,7 @@ def game_loop():
         else:
             st.write("최대 시도 횟수에 도달했습니다.")
             st.session_state.game_in_progress = False
+
 
 # --- 메인 게임 흐름 ---
 if not st.session_state.game_in_progress:
