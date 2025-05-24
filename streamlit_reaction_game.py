@@ -194,7 +194,8 @@ if st.button("설문 제출"):
                 q4
             ]
             request = sheet.values().append(
-                spreadsheetId=SPREAD
+                SPREADSHEET_ID = '14AcGHQwN8ydeUEPvxGWEl4mB7sueY1g9TV9fptMJpiI'
+
 if st.button("설문 제출"):
     if not st.session_state.user_name:
         st.warning("이름을 입력해 주세요.")
@@ -213,17 +214,13 @@ if st.button("설문 제출"):
                 q3,
                 q4
             ]
-            request = sheet.values().append(
+            sheet.values().append(
                 spreadsheetId=SPREADSHEET_ID,
-              request = sheet.values().append(
-    spreadsheetId=SPREADSHEET_ID,
-    range="도파민 타이밍 게임 기록",
-    valueInputOption="USER_ENTERED",
-    insertDataOption="INSERT_ROWS",
-    body={"values": [values]}
-)
-
-            response = request.execute()
-            st.success("설문이 성공적으로 제출되었습니다. 참여해 주셔서 감사합니다!")
+                range="도파민 타이밍 게임 기록",
+                valueInputOption="USER_ENTERED",
+                insertDataOption="INSERT_ROWS",
+                body={"values": [values]}
+            ).execute()
+            st.success("설문이 성공적으로 제출되었습니다!")
         except Exception as e:
-            st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
+            st.error(f"설문 제출 실패: {e}")
