@@ -4,13 +4,18 @@ import time
 import datetime
 
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials  # <-- 여기 변경
 
-# --- 구글 스프레드시트 설정 (gspread 방식) ---
+# 구글 API 범위 설정
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('statistics-festival-6037ec1a564b.json', scope)
+
+# JSON 키 파일 대신 st.secrets 사용 가정
+creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
+
+# gspread 클라이언트 인증
 client = gspread.authorize(creds)
-sheet = client.open("설문지 제목").sheet1  # 실제 시트 이름으로 바꾸세요
+sheet = client.open("도파민 타이밍 게임 기록").sheet1
+
 
 # --- 클래스별 성공률 및 시간 조작 비율 설정 (1~10반) ---
 class_settings = {
