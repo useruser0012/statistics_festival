@@ -143,6 +143,11 @@ elif st.session_state.page == "game":
                 st.session_state.waiting_for_click = True
                 st.session_state.result_message = ""
 
+                # 딜레이를 0.5초 ~ 1.5초 사이로 설정
+                delay = random.uniform(0.5, 1.5)
+                st.session_state.next_click_time = time.time() + delay
+                st.session_state.reaction_start_time = st.session_state.next_click_time
+
                 # 클릭할 수 있는 시간은 0.5~1.5초 뒤 랜덤으로 설정 (기존 1~3초에서 줄임)
                 delay = random.uniform(0.5, 1.5)
                 st.session_state.next_click_time = time.time() + delay
