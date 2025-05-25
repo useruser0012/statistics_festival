@@ -47,11 +47,8 @@ def reset_game():
 # 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
-if 'user_name' not in st.session_state:
     st.session_state.user_name = ""
-if 'class_num' not in st.session_state:
     st.session_state.class_num = 1
-if 'tries' not in st.session_state:
     reset_game()
 
 # 시작 페이지
@@ -99,7 +96,6 @@ elif st.session_state.page == 'game':
         if st.button("클릭!"):
             raw_reaction_time = time.time() - st.session_state.reaction_start_time
             reaction_time = raw_reaction_time * time_factor
-
             st.write(f"반응시간: {reaction_time:.3f}초")
 
             if reaction_time < 0.2:
