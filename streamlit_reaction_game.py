@@ -43,12 +43,11 @@ def reset_game():
     st.session_state.successes = 0
     st.session_state.failures = 0
     st.session_state.coins = 10
-    st.session_state.state = 'ready'  # 초기 상태 설정
+    st.session_state.state = 'ready'  # ready, waiting, click_now
     st.session_state.next_click_time = 0
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
 
-# 초기화 세팅
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 
@@ -60,10 +59,6 @@ if 'class_num' not in st.session_state:
 
 if 'tries' not in st.session_state:
     reset_game()
-
-if 'state' not in st.session_state:
-    st.session_state.state = 'ready'  # 이 줄이 반드시 필요함
-
 
 # 시작 페이지
 if st.session_state.page == 'start':
