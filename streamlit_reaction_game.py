@@ -89,7 +89,7 @@ elif st.session_state.page == 'game':
 
     if st.session_state.state == 'ready':
         if st.button("시작"):
-            delay = random.uniform(1.0, 3.0)
+            delay = random.uniform(0.05, 0.5)
             st.session_state.next_click_time = now + delay
             st.session_state.state = 'waiting'
             st.session_state.result_message = ""
