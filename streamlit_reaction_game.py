@@ -78,15 +78,16 @@ elif st.session_state.page == 'game':
 
     now = time.time()
 
-    if st.session_state.state == 'ready':
-        if st.button("시작"):
-            delay = random.uniform(0.05, 0.5)
-            st.session_state.next_click_time = now + delay
-            st.session_state.state = 'waiting'
-            st.session_state.result_message = ""
-            st.session_state.tries += 1
+if st.session_state.state == 'ready':
+    if st.button("시작"):
+        delay = random.uniform(0.05, 0.5)
+        st.session_state.next_click_time = now + delay
+        st.session_state.state = 'waiting'
+        st.session_state.result_message = ""
+        st.session_state.tries += 1
 
-   from streamlit_autorefresh import st_autorefresh
+   from streamlit_autorefresh import st_autorefresh  # ❌ 여기가 들여쓰기 문제입니다!
+
 
 elif st.session_state.state == 'waiting':
     st.write("준비 중... 잠시만 기다려주세요.")
