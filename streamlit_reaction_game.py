@@ -89,11 +89,15 @@ elif st.session_state.page == 'game':
             st.session_state.result_message = ""
             st.session_state.tries += 1
 
-    elif st.session_state.state == 'waiting':
-        st.write("준비 중... 잠시만 기다려주세요.")
-        if now >= st.session_state.next_click_time:
-            st.session_state.state = 'click_now'
-            st.session_state.reaction_start_time = time.time()
+elif st.session_state.state == 'waiting':
+    st.write("준비 중... 잠시만 기다려주세요.")
+    if time.time() >= st.session_state.next_click_time:
+        st.session_state.state = 'click_now'
+        st.session_state.reaction_start_time = time.time()
+    else:
+        time.sleep(0.1)  # 0.1초 대기
+        st.rerun()
+
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
