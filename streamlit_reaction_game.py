@@ -4,6 +4,7 @@ import random
 import datetime
 import gspread
 from google.oauth2.service_account import Credentials
+from streamlit_autorefresh import st_autorefresh  # ✅ 이 줄은 여기에 위치해야 합니다.
 
 # 구글 시트 설정
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
