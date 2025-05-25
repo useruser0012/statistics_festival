@@ -87,9 +87,6 @@ if st.session_state.state == 'ready':
         st.session_state.result_message = ""
         st.session_state.tries += 1
 
-   from streamlit_autorefresh import st_autorefresh  # ❌ 여기가 들여쓰기 문제입니다!
-
-
 elif st.session_state.state == 'waiting':
     st.write("준비 중... 잠시만 기다려주세요.")
 
