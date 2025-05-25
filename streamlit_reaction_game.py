@@ -86,11 +86,18 @@ elif st.session_state.page == 'game':
             st.session_state.result_message = ""
             st.session_state.tries += 1
 
-    elif st.session_state.state == 'waiting':
-        st.write("준비 중... 잠시만 기다려주세요.")
-        if now >= st.session_state.next_click_time:
-            st.session_state.state = 'click_now'
-            st.session_state.reaction_start_time = time.time()
+   from streamlit_autorefresh import st_autorefresh
+
+elif st.session_state.state == 'waiting':
+    st.write("준비 중... 잠시만 기다려주세요.")
+
+    # 500ms마다 새로고침
+    st_autorefresh(interval=500, key="autorefresh")
+
+    if now >= st.session_state.next_click_time:
+        st.session_state.state = 'click_now'
+        st.session_state.reaction_start_time = time.time()
+        st.experimental_rerun()
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
