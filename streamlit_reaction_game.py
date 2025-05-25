@@ -79,24 +79,24 @@ elif st.session_state.page == 'game':
 
     now = time.time()
 
-if st.session_state.state == 'ready':
-    if st.button("시작"):
-        delay = random.uniform(0.05, 0.5)
-        st.session_state.next_click_time = now + delay
-        st.session_state.state = 'waiting'
-        st.session_state.result_message = ""
-        st.session_state.tries += 1
+    if st.session_state.state == 'ready':
+        if st.button("시작"):
+            delay = random.uniform(0.05, 0.5)
+            st.session_state.next_click_time = now + delay
+            st.session_state.state = 'waiting'
+            st.session_state.result_message = ""
+            st.session_state.tries += 1
 
-elif st.session_state.state == 'waiting':
-    st.write("준비 중... 잠시만 기다려주세요.")
+    elif st.session_state.state == 'waiting':
+        st.write("준비 중... 잠시만 기다려주세요.")
 
-    # 500ms마다 새로고침
-    st_autorefresh(interval=500, key="autorefresh")
+        # 500ms마다 새로고침
+        st_autorefresh(interval=500, key="autorefresh")
 
-    if now >= st.session_state.next_click_time:
-        st.session_state.state = 'click_now'
-        st.session_state.reaction_start_time = time.time()
-        st.experimental_rerun()
+        if now >= st.session_state.next_click_time:
+            st.session_state.state = 'click_now'
+            st.session_state.reaction_start_time = time.time()
+            st.experimental_rerun()
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
@@ -131,6 +131,7 @@ elif st.session_state.state == 'waiting':
 
     if st.button("게임 종료 후 설문조사"):
         st.session_state.page = 'survey'
+
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
