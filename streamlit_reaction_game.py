@@ -100,8 +100,6 @@ elif st.session_state.page == 'game':
         if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
             st.session_state.reaction_start_time = time.time()
-            st.experimental_rerun()  # → 여기선 넣으면 즉시 'click_now' 상태 UI로 넘어감
-
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
