@@ -5,13 +5,13 @@ import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
-# --- 구글 시트 설정 ---
+# 구글 시트 설정
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
-# --- 반별 시간 조작 설정 ---
+# 반별 시간 조작 설정
 class_settings = {
     1: {"time_factor": 1.0},
     2: {"time_factor": 0.8},
@@ -44,17 +44,20 @@ def reset_game():
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
 
-# --- 초기화 ---
+# 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'user_name' not in st.session_state:
     st.session_state.user_name = ""
 if 'class_num' not in st.session_state:
     st.session_state.class_num = 1
-if 'state' not in st.session_state:
+if 'tries' not in st.session_state:
     reset_game()
 
-# --- 시작 페이지 ---
+# 현재 시간 미리 저장 (한 화면 렌더링 내내 동일한 시간 유지)
+now = time.time()
+
+# 시작 페이지
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
@@ -65,9 +68,9 @@ if st.session_state.page == 'start':
         else:
             reset_game()
             st.session_state.page = 'game'
-            st.experimental_rerun()
+            st.experimental_rerun()  # 페이지 전환 후 다시 실행
 
-# --- 게임 페이지 ---
+# 게임 페이지
 elif st.session_state.page == 'game':
     st.title("도파민 타이밍 게임 진행 중")
     user_name = st.session_state.user_name
@@ -80,28 +83,25 @@ elif st.session_state.page == 'game':
     if st.session_state.result_message:
         st.markdown(st.session_state.result_message)
 
-    now = time.time()
-
+    # 게임 상태에 따른 처리
     if st.session_state.state == 'ready':
         if st.button("시작"):
-            delay = random.uniform(0.5, 1.5)
+            delay = random.uniform(0.5, 2.0)  # 대기 시간 범위 좀 늘림
             st.session_state.next_click_time = now + delay
             st.session_state.state = 'waiting'
             st.session_state.result_message = ""
             st.session_state.tries += 1
             st.experimental_rerun()
-        else:
-            st.write("준비가 되면 시작 버튼을 눌러주세요.")
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
         if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
-            st.session_state.reaction_start_time = time.time()
+            st.session_state.reaction_start_time = now
             st.experimental_rerun()
         else:
-            # 그냥 화면 새로고침으로 대기 상태 유지
-            st.experimental_rerun()
+            # 대기 중이므로 버튼 없이 메시지만 보여줌
+            st.write(f"버튼 클릭 가능까지 {st.session_state.next_click_time - now:.2f}초 남음")
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
@@ -131,9 +131,8 @@ elif st.session_state.page == 'game':
 
             st.session_state.state = 'ready'
             st.experimental_rerun()
-        else:
-            st.write("지금 '클릭!' 버튼을 눌러주세요!")
 
+    # 최대 시도 제한
     if st.session_state.tries >= 1000:
         st.write("최대 시도 횟수에 도달했습니다. 설문조사 페이지로 이동합니다.")
         st.session_state.page = 'survey'
@@ -143,7 +142,7 @@ elif st.session_state.page == 'game':
         st.session_state.page = 'survey'
         st.experimental_rerun()
 
-# --- 설문조사 페이지 ---
+# 설문조사 페이지
 elif st.session_state.page == 'survey':
     st.title("설문조사")
     st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
