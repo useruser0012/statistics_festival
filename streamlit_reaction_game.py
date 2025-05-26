@@ -4,6 +4,70 @@ import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
+import streamlit as st
+
+# 🎨 배경 이미지 URL (더 화려한 조커 카드 배경)
+background_url = "https://i.imgur.com/93UJmQf.jpeg"  # 원하면 다른 이미지로 교체 가능
+
+# 💄 스타일 설정 (조커 느낌 + 화려함)
+st.markdown(f"""
+<style>
+/* 전체 배경 설정 */
+[data-testid="stAppViewContainer"] {{
+    background-image: url('{background_url}');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    color: white;
+}}
+
+/* 메인 컨테이너 반투명 처리 */
+[data-testid="stAppViewContainer"] .block-container {{
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 0 30px rgba(255,255,255,0.3);
+}}
+
+/* 제목 스타일 */
+h1, h2, h3 {{
+    color: #ffdd00;
+    text-shadow: 2px 2px 6px #000;
+}}
+
+/* 버튼 스타일 */
+button {{
+    background-color: #e84118 !important;
+    color: white !important;
+    font-weight: bold;
+    border-radius: 12px !important;
+    box-shadow: 0 0 10px #e84118 !important;
+}}
+</style>
+""", unsafe_allow_html=True)
+
+# 🃏 조커 테마 폰트 (코믹하고 장난기 많은 느낌)
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<style>
+html, body, [class*="css"] {
+    font-family: 'Bangers', cursive;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# 🎮 게임 제목 및 인트로 메시지
+st.title("🃏 조커의 카드 맞추기 챌린지")
+
+st.markdown("""
+<p style='font-size:24px; color:#ffffff; text-shadow: 1px 1px 3px #000;'> 
+🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
+카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
+맞출 수 있을까? 아니면 조커에게 놀아날까?
+</p>
+""", unsafe_allow_html=True)
+
 # 🎨 조커 테마 스타일 추가
 st.markdown("""
 <style>
