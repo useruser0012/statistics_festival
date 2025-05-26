@@ -12,6 +12,7 @@ creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"],
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
+# 반별 시간 조작 비율
 class_settings = {
     1: {"time_factor": 1.0},
     2: {"time_factor": 0.8},
@@ -47,6 +48,7 @@ def reset_game():
     st.session_state.reaction_time = None
     st.session_state.result = ""
 
+# 세션 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'user_name' not in st.session_state:
@@ -56,6 +58,7 @@ if 'class_num' not in st.session_state:
 if 'tries' not in st.session_state:
     reset_game()
 
+# 시작 페이지
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
@@ -67,6 +70,7 @@ if st.session_state.page == 'start':
             reset_game()
             st.session_state.page = 'game'
 
+# 게임 페이지
 elif st.session_state.page == 'game':
     st.title("도파민 타이밍 게임")
     user_name = st.session_state.user_name
@@ -76,67 +80,41 @@ elif st.session_state.page == 'game':
     st.write(f"👤 {user_name}님 | 🏫 {class_num}반")
     st.write(f"🔁 시도: {st.session_state.tries} | ✅ 성공: {st.session_state.successes} | ❌ 실패: {st.session_state.failures} | 🪙 코인: {st.session_state.coins}")
 
-    if st.session_state.result_message:
-        # 고정 높이 결과 메시지 박스 + 스크롤
-        st.markdown(
-            f"""
-            <div style="
-                height:100px; 
-                overflow-y:auto; 
-                border:1px solid #ddd; 
-                padding:10px; 
-                margin-bottom:10px; 
-                white-space: pre-wrap;
-                font-size:16px;
-                ">
-                {st.session_state.result_message}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    else:
-        # 결과 메시지가 없을 땐 빈 박스 자리 확보
-        st.markdown(
-            """
-            <div style="
-                height:100px; 
-                margin-bottom:10px;
-                ">
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+    # 고정 높이 텍스트 박스
+    message = ""
     phase = st.session_state.phase
 
-    # 버튼 고정 크기 스타일 지정
-    button_style = """
-        <style>
-        div.stButton > button {
-            width: 150px;
-            height: 50px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        </style>
-    """
-    st.markdown(button_style, unsafe_allow_html=True)
-
     if phase == "start":
-        st.write("버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!")
+        message = "버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!"
+    elif phase == "wait":
+        message = "준비하세요... 곧 시작됩니다!"
+    elif phase == "react":
+        message = "🟢 지금 클릭하세요!"
+    elif phase == "result":
+        message = f"⏱ 반응 속도: {st.session_state.reaction_time}초"
+
+    st.markdown(
+        f"""
+        <div style="height: 80px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+            {message}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 게임 단계별 버튼 처리
+    if phase == "start":
         if st.button("게임 시작"):
             st.session_state.phase = "wait"
-            st.experimental_rerun()
+            st.rerun()
 
     elif phase == "wait":
-        st.write("준비하세요... 곧 시작됩니다!")
         time.sleep(random.uniform(1.5, 3.0))
         st.session_state.start_time = time.time()
         st.session_state.phase = "react"
-        st.experimental_rerun()
+        st.rerun()
 
     elif phase == "react":
-        st.success("🟢 지금 클릭하세요!")
         if st.button("클릭!"):
             raw_time = time.time() - st.session_state.start_time
             reaction_time = raw_time * time_factor
@@ -147,21 +125,21 @@ elif st.session_state.page == 'game':
                 st.session_state.failures += 1
                 loss = calculate_failure_coin_loss(st.session_state.tries)
                 st.session_state.coins -= loss
-                st.session_state.result_message = f"❌ 5초 초과로 실패! 코인 {loss}개 손실."
+                st.session_state.result = f"❌ 5초 초과로 실패! 코인 {loss}개 손실."
             else:
                 st.session_state.successes += 1
                 gain = random.randint(30, 100)
                 st.session_state.coins += gain
-                st.session_state.result_message = f"✅ 반응시간 {reaction_time:.3f}초, 코인 {gain}개 획득!"
+                st.session_state.result = f"✅ 반응시간 {reaction_time:.3f}초, 코인 {gain}개 획득!"
             st.session_state.phase = "result"
-            st.experimental_rerun()
+            st.rerun()
 
     elif phase == "result":
-        st.subheader(f"⏱ 반응 속도: {st.session_state.reaction_time}초")
+        st.markdown(f"### {st.session_state.result}")
         if st.button("다시 도전"):
             st.session_state.phase = "start"
-            st.session_state.result_message = ""
-            st.experimental_rerun()
+            st.session_state.result_message = st.session_state.result
+            st.rerun()
 
     if st.session_state.tries >= 1000:
         st.write("📊 최대 시도에 도달했습니다. 설문조사로 이동합니다.")
@@ -170,6 +148,7 @@ elif st.session_state.page == 'game':
     if st.button("게임 종료 후 설문조사"):
         st.session_state.page = 'survey'
 
+# 설문조사 페이지
 elif st.session_state.page == 'survey':
     st.title("설문조사")
     st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
