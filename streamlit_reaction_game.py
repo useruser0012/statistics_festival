@@ -2,7 +2,6 @@ import streamlit as st
 import time
 import random
 import datetime
-
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -114,7 +113,7 @@ elif st.session_state.page == 'game':
         # 타이머 대기
         if time.time() < st.session_state.wait_start_time:
             st.write("잠시만 기다려 주세요...")
-            st.stop()  # 이 시점에서 화면 멈춤, 이후 새로고침 시 상태 다시 체크
+            st.stop()  # 타이머 완료 전까지 화면 멈춤
         else:
             st.session_state.start_time = time.time()
             st.session_state.phase = "react"
@@ -147,6 +146,7 @@ elif st.session_state.page == 'game':
             st.session_state.phase = "start"
             st.experimental_rerun()
 
+    # 최대 시도 도달 시 설문 페이지로 이동
     if st.session_state.tries >= 1000:
         st.write("📊 최대 시도에 도달했습니다. 설문조사로 이동합니다.")
         st.session_state.page = 'survey'
