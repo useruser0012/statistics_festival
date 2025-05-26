@@ -4,13 +4,12 @@ import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
-# --- 구글 스프레드시트 연결 설정 ---
+# 구글 스프레드시트 연결 설정
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
-# --- 초기화 함수 ---
 def reset_game():
     st.session_state.coins = 10
     st.session_state.successes = 0
@@ -19,18 +18,12 @@ def reset_game():
     st.session_state.result_message = ""
 
 def get_dynamic_success_probability(class_num, tries):
-    """
-    1,3,5,7,9반은 초기 성공률 높다가 점점 내려가는 도박 패턴.
-    다른 반은 고정 확률 유지.
-    """
     if class_num in [1,3,5,7,9]:
         max_tries = 30
         initial_prob = 0.7
         min_prob = 0.1
-        # 선형 감소
         prob = initial_prob - (tries / max_tries) * (initial_prob - min_prob)
         prob = max(prob, min_prob)
-        # 랜덤 노이즈 추가 (-0.05 ~ +0.05)
         noise = random.uniform(-0.05, 0.05)
         prob = min(max(prob + noise, 0), 1)
         return prob
@@ -49,16 +42,16 @@ def play_round(class_num):
     if success_flag:
         st.session_state.coins += coin_change
         st.session_state.successes += 1
-        message = f"성공! 코인이 +{coin_change} 만큼 증가했습니다. (성공확률: {prob:.2f})"
+        message = f"성공! 코인이 +{coin_change} 만큼 증가했습니다."
     else:
         st.session_state.coins -= coin_change
         st.session_state.failures += 1
-        message = f"실패... 코인이 -{coin_change} 만큼 감소했습니다. (성공확률: {prob:.2f})"
+        message = f"실패... 코인이 -{coin_change} 만큼 감소했습니다."
 
     st.session_state.tries += 1
     return message
 
-# --- 세션 상태 초기값 설정 ---
+# 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'coins' not in st.session_state:
@@ -75,10 +68,7 @@ if 'tries' not in st.session_state:
     st.session_state.tries = 0
 if 'result_message' not in st.session_state:
     st.session_state.result_message = ""
-if 'need_rerun' not in st.session_state:
-    st.session_state.need_rerun = False
 
-# --- 페이지별 UI 및 로직 ---
 if st.session_state.page == 'start':
     st.title("게임 시작 페이지")
     st.session_state.user_name = st.text_input("이름을 입력하세요")
@@ -86,7 +76,7 @@ if st.session_state.page == 'start':
     if st.button("게임 시작") and st.session_state.user_name.strip() != "":
         reset_game()
         st.session_state.page = 'game'
-        st.session_state.need_rerun = True
+        st.experimental_rerun()
 
 elif st.session_state.page == 'game':
     st.title("카드 맞추기 게임")
@@ -96,14 +86,14 @@ elif st.session_state.page == 'game':
 
     if st.button("카드 선택 (1/2 확률 게임)"):
         st.session_state.result_message = play_round(st.session_state.class_num)
-        st.session_state.need_rerun = True
+        st.experimental_rerun()
 
     if st.session_state.result_message:
         st.info(st.session_state.result_message)
 
     if st.button("그만하기 및 설문조사"):
         st.session_state.page = 'survey'
-        st.session_state.need_rerun = True
+        st.experimental_rerun()
 
 elif st.session_state.page == 'survey':
     st.title("설문조사")
@@ -126,8 +116,3 @@ elif st.session_state.page == 'survey':
             st.success("설문이 제출되었습니다! 감사합니다.")
         except Exception as e:
             st.error(f"설문 제출 중 오류 발생: {e}")
-
-# --- need_rerun 플래그 체크 후 rerun 호출 ---
-if st.session_state.need_rerun:
-    st.session_state.need_rerun = False
-    st.experimental_rerun()
