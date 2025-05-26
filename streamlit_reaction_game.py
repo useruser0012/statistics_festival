@@ -71,7 +71,7 @@ if st.session_state.page == 'start':
         st.session_state.class_num = class_num
         reset_game()
         st.session_state.page = 'game'
-        st.experimental_rerun()
+        st.rerun()
 
 # 2. 게임 플레이 페이지
 elif st.session_state.page == 'game':
@@ -90,7 +90,7 @@ elif st.session_state.page == 'game':
             st.error("사용자 이름이 비어 있습니다. 설문으로 이동할 수 없습니다.")
         else:
             st.session_state.page = 'survey'
-            st.experimental_rerun()
+            st.rerun()
 
 # 3. 설문조사 페이지
 elif st.session_state.page == 'survey':
@@ -130,7 +130,6 @@ elif st.session_state.page == 'survey':
             st.session_state.user_name = ''
             st.session_state.class_num = 1
             st.session_state.page = 'start'
-            st.experimental_rerun()
+            st.rerun()
         except Exception as e:
             st.error(f"❌ 설문 제출 중 오류 발생: {e}")
-
