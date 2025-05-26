@@ -45,7 +45,7 @@ def reset_game():
     st.session_state.next_click_time = 0
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
-    st.session_state.has_rerun_waiting = False  # 플래그 초기화 추가
+    st.session_state.has_rerun_waiting = False  # 플래그 초기화
 
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
@@ -90,13 +90,17 @@ elif st.session_state.page == 'game':
             st.session_state.state = 'waiting'
             st.session_state.result_message = ""
             st.session_state.tries += 1
-            st.session_state.has_rerun_waiting = False  # 플래그 리셋
+            st.session_state.has_rerun_waiting = False  # waiting 상태 입장 시 플래그 초기화
             st.experimental_rerun()
             st.stop()
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
-        # has_rerun_waiting 플래그 확인해서 한 번만 리런 하도록 함
+        
+        # waiting 상태의 플래그 초기화 (안 된 경우)
+        if 'has_rerun_waiting' not in st.session_state:
+            st.session_state.has_rerun_waiting = False
+
         if now >= st.session_state.next_click_time and not st.session_state.has_rerun_waiting:
             st.session_state.state = 'click_now'
             st.session_state.reaction_start_time = now
