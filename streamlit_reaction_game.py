@@ -65,7 +65,7 @@ if 'tries' not in st.session_state:
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
-    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num - 1)
+    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num-1)
     if st.button("게임 시작"):
         if not st.session_state.user_name.strip():
             st.warning("이름을 입력해 주세요.")
@@ -92,19 +92,19 @@ elif st.session_state.page == 'game':
     if st.session_state.state == 'ready':
         if st.button("시작"):
             delay = random.uniform(0.05, 0.5)
-            st.session_state.next_click_time = time.time() + delay
+            st.session_state.next_click_time = now + delay
             st.session_state.state = 'waiting'
             st.session_state.result_message = ""
             st.session_state.tries += 1
-            st.experimental_rerun()  # 상태 변경이므로 rerun 호출
+            st.experimental_rerun()
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
-        if time.time() >= st.session_state.next_click_time:
+        if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
-            st.session_state.reaction_start_time = time.time()
-            st.experimental_rerun()  # 상태 변경이므로 rerun 호출
-        # else: rerun 호출 안 함 => 무한 호출 방지
+            st.session_state.reaction_start_time = now
+            st.experimental_rerun()
+        # else: 기다리는 중, rerun 호출 안 함 (무한 호출 방지)
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
@@ -134,7 +134,7 @@ elif st.session_state.page == 'game':
                 st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
 
             st.session_state.state = 'ready'
-            st.experimental_rerun()  # 결과 보여주고 바로 상태변경 후 rerun
+            st.experimental_rerun()
 
     # 최대 시도 제한
     if st.session_state.tries >= 1000:
