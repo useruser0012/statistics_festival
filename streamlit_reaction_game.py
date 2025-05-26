@@ -2,9 +2,11 @@ import streamlit as st
 import time
 import random
 import datetime
-
 import gspread
 from google.oauth2.service_account import Credentials
+
+# st_autorefresh 설치 필요 (pip install streamlit-autorefresh)
+from streamlit_autorefresh import st_autorefresh
 
 # 구글 API 설정
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
@@ -12,6 +14,7 @@ creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"],
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
+# 반별 시간 조작 비율 (반응시간에 곱함)
 class_settings = {
     1: {"time_factor": 1.0},
     2: {"time_factor": 0.8},
@@ -41,12 +44,14 @@ def reset_game():
     st.session_state.successes = 0
     st.session_state.failures = 0
     st.session_state.coins = 10
-    st.session_state.state = 'ready'
+    st.session_state.state = 'ready'  # ready, waiting, click_now
     st.session_state.next_click_time = 0
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
+    st.session_state.start_clicked = False
+    st.session_state.clicked = False
 
-# 세션 상태 초기화 (처음 한 번만)
+# 세션 상태 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'user_name' not in st.session_state:
@@ -56,27 +61,24 @@ if 'class_num' not in st.session_state:
 if 'tries' not in st.session_state:
     reset_game()
 
-# --- 페이지별 처리 ---
+# 시작 페이지
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
     st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num-1)
-
     if st.button("게임 시작"):
         if not st.session_state.user_name.strip():
             st.warning("이름을 입력해 주세요.")
         else:
             reset_game()
             st.session_state.page = 'game'
-            st.experimental_rerun()  # 버튼 클릭 이벤트 내부에서 안전하게 호출
-    else:
-        st.stop()  # 버튼 안 누르면 이 밑 실행 금지
 
+# 게임 페이지
 elif st.session_state.page == 'game':
     st.title("도파민 타이밍 게임 진행 중")
     user_name = st.session_state.user_name
     class_num = st.session_state.class_num
-    time_factor = class_settings.get(class_num, {"time_factor": 1.0})["time_factor"]
+    time_factor = class_settings[class_num]["time_factor"]
 
     st.write(f"{user_name}님, {class_num}반 게임 중입니다.")
     st.write(f"총 시도: {st.session_state.tries} | 성공: {st.session_state.successes} | 실패: {st.session_state.failures} | 코인: {st.session_state.coins}")
@@ -86,68 +88,74 @@ elif st.session_state.page == 'game':
 
     now = time.time()
 
+    # 자동 새로고침 (200ms) — waiting 상태일 때만 동작
+    if st.session_state.state == 'waiting':
+        st_autorefresh(interval=200, key="auto_refresh")
+
     if st.session_state.state == 'ready':
-        if st.button("시작"):
-            delay = random.uniform(0.05, 0.5)
-            st.session_state.next_click_time = now + delay
-            st.session_state.state = 'waiting'
-            st.session_state.result_message = ""
-            st.session_state.tries += 1
-            st.experimental_rerun()
-        else:
-            st.stop()
+        if not st.session_state.start_clicked:
+            if st.button("시작"):
+                delay = random.uniform(0.05, 0.5)
+                st.session_state.next_click_time = now + delay
+                st.session_state.state = 'waiting'
+                st.session_state.result_message = ""
+                st.session_state.tries += 1
+                st.session_state.start_clicked = True
+                st.session_state.clicked = False
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
+        # 시간 도달 시 상태 변경
         if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
-            st.session_state.reaction_start_time = now
-            st.experimental_rerun()
-        else:
-            st.stop()
+            st.session_state.reaction_start_time = time.time()
+            st.session_state.start_clicked = False  # 다음 시작 준비
+            st.experimental_rerun()  # 즉시 화면 갱신
 
     elif st.session_state.state == 'click_now':
-        if st.button("클릭!"):
-            raw_reaction_time = time.time() - st.session_state.reaction_start_time
-            reaction_time = raw_reaction_time * time_factor
+        if not st.session_state.clicked:
+            if st.button("클릭!"):
+                raw_reaction_time = time.time() - st.session_state.reaction_start_time
+                reaction_time = raw_reaction_time * time_factor
 
-            st.write(f"반응시간: {reaction_time:.3f}초")
+                st.write(f"반응시간: {reaction_time:.3f}초")
 
-            if reaction_time < 0.2:
-                st.warning("너무 빨리 클릭하셨습니다! 실패 처리됩니다.")
-                st.session_state.failures += 1
-                coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                st.session_state.coins -= coin_loss
-                st.session_state.result_message = f"너무 빠른 클릭으로 실패! 코인 {coin_loss}개 손실."
-            elif reaction_time > 1.5:
-                st.warning("너무 늦게 클릭하셨습니다! 실패 처리됩니다.")
-                st.session_state.failures += 1
-                coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                st.session_state.coins -= coin_loss
-                st.session_state.result_message = f"너무 늦은 클릭으로 실패! 코인 {coin_loss}개 손실."
-            else:
-                st.success("성공했습니다!")
-                st.session_state.successes += 1
-                coin_gain = random.randint(30, 100)
-                st.session_state.coins += coin_gain
-                st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
+                if reaction_time < 0.2:
+                    st.warning("너무 빨리 클릭하셨습니다! 실패 처리됩니다.")
+                    st.session_state.failures += 1
+                    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+                    st.session_state.coins -= coin_loss
+                    st.session_state.result_message = f"너무 빠른 클릭으로 실패! 코인 {coin_loss}개 손실."
+                elif reaction_time > 1.5:
+                    st.warning("너무 늦게 클릭하셨습니다! 실패 처리됩니다.")
+                    st.session_state.failures += 1
+                    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+                    st.session_state.coins -= coin_loss
+                    st.session_state.result_message = f"너무 늦은 클릭으로 실패! 코인 {coin_loss}개 손실."
+                else:
+                    st.success("성공했습니다!")
+                    st.session_state.successes += 1
+                    coin_gain = random.randint(30, 100)
+                    st.session_state.coins += coin_gain
+                    st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
 
-            st.session_state.state = 'ready'
-            st.experimental_rerun()
-        else:
-            st.stop()
+                st.session_state.state = 'ready'
+                st.session_state.clicked = True
+                st.experimental_rerun()  # 즉시 화면 갱신
 
+    # 최대 시도 제한
     if st.session_state.tries >= 1000:
         st.write("최대 시도 횟수에 도달했습니다. 설문조사 페이지로 이동합니다.")
         st.session_state.page = 'survey'
         st.experimental_rerun()
-        st.stop()
 
-    if st.button("게임 종료 후 설문조사"):
-        st.session_state.page = 'survey'
-        st.experimental_rerun()
-        st.stop()
+    # 게임 중 설문조사 버튼
+    if st.session_state.page == 'game':
+        if st.button("게임 종료 후 설문조사"):
+            st.session_state.page = 'survey'
+            st.experimental_rerun()
 
+# 설문조사 페이지
 elif st.session_state.page == 'survey':
     st.title("설문조사")
     st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
@@ -170,11 +178,9 @@ elif st.session_state.page == 'survey':
         except Exception as e:
             st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
 
-        # 설문 제출 후 상태 초기화 및 시작 페이지로 이동
+        # 초기화
         st.session_state.page = "start"
         st.session_state.user_name = ""
         st.session_state.class_num = 1
         reset_game()
         st.experimental_rerun()
-    else:
-        st.stop()
