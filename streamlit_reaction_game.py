@@ -124,7 +124,7 @@ if st.session_state.page == 'start':
 
 # 2. 게임 페이지
 elif st.session_state.page == 'game':
-    st.title("🃏 카드 맞추기 게임")
+   #### st.title("🃏 카드 맞추기 게임")
     st.write(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
     st.write(f"이전 코인: {st.session_state.coins}")
     st.write(f"도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
