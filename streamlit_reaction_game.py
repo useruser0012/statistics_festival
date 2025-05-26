@@ -36,21 +36,7 @@ button {
 }
 
 </style>
-""", unsafe_allow_html=True)
-
-# 🎰 조커 느낌의 폰트 적용
-st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<style>
-html, body, [class*="css"] {
-    font-family: 'Playfair Display', serif;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# 🃏 게임 제목
-st.title("🃏 조커의 반응속도 챌린지")
-st.markdown("조커가 속삭인다... **얼마나 빠른지 보자꾸나!** 🎩")
+""", unsafe_allow_html=Tr지 보자꾸나!** 🎩")
 
 
 # 구글 스프레드시트 연결
