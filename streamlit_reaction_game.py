@@ -115,7 +115,7 @@ elif st.session_state.page == 'game':
         st.rerun()
 
     elif phase == "react":
-        if st.button("클릭!"):
+        if st.button("지금 클릭!"):
             raw_time = time.time() - st.session_state.start_time
             reaction_time = raw_time * time_factor
             st.session_state.reaction_time = round(reaction_time, 3)
