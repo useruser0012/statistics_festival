@@ -92,9 +92,8 @@ elif st.session_state.page == 'game':
             st.session_state.page = 'survey'
             st.rerun()
 
-# 3. 설문조사 페이지
+# 3. 설문조사 페이지 (두 번째 설문)  [수정됨]
 elif st.session_state.page == 'survey':
-    # 사용자 이름 확인 (예외 방지)
     if st.session_state.user_name.strip() == "":
         st.error("사용자 이름이 없습니다. 다시 시작해 주세요.")
         st.session_state.page = 'start'
@@ -103,10 +102,12 @@ elif st.session_state.page == 'survey':
     st.title("📝 설문조사")
     st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
 
-    q1 = st.radio("1. 게임의 흥미도는 어땠나요?", ["매우 흥미로움", "흥미로움", "보통", "흥미롭지 않음"])
-    q2 = st.radio("2. 게임이 공정하다고 느꼈나요?", ["매우 공정함", "공정함", "보통", "공정하지 않음"])
-    q3 = st.radio("3. 게임 중 충동을 느꼈나요?", ["매우 충동적임", "충동적임", "보통", "충동적이지 않음"])
-    q4 = st.text_area("4. 비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
+    q1 = st.radio("1. 게임이 재미있었나요?", ["매우 흥미로움", "흥미로움", "보통", "흥미롭지 않음"])
+    q2 = st.radio("2. 난이도는 어땠나요?", ["매우 쉬움", "쉬움", "보통", "어려움"])
+    q3 = st.radio("3. 이 게임은 도박과 관련 있다고 생각하나요?", ["매우 관련 있다", "관련 있다", "보통", "관련 없다"])
+    q3_reason = st.text_area("   ➕ 그렇게 생각한 이유를 적어주세요.")
+    q4 = st.radio("4. 이 게임이 도박 중독을 유발할 수 있다고 생각하나요?", ["매우 그렇다", "그렇다", "보통", "그렇지 않다"])
+    q5 = st.radio("5. 코인이 실제 돈이었다면 결과는 달라졌을까요?", ["매우 달라졌을 것", "약간 달라졌을 것", "보통", "변화 없었을 것"])
 
     if st.button("설문 제출"):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -121,15 +122,43 @@ elif st.session_state.page == 'survey':
             q1,
             q2,
             q3,
-            q4
+            q3_reason,
+            q4,
+            q5
         ]
         try:
             sheet.append_row(data)
+
+            # [수정됨] 응답 내용 저장
+            st.session_state['survey_q1'] = q1
+            st.session_state['survey_q2'] = q2
+            st.session_state['survey_q3'] = q3
+            st.session_state['survey_q3_reason'] = q3_reason
+            st.session_state['survey_q4'] = q4
+            st.session_state['survey_q5'] = q5
+
             st.success("✅ 설문이 제출되었습니다! 감사합니다.")
-            reset_game()
-            st.session_state.user_name = ''
-            st.session_state.class_num = 1
-            st.session_state.page = 'start'
+            st.session_state.page = 'submitted'
             st.rerun()
         except Exception as e:
             st.error(f"❌ 설문 제출 중 오류 발생: {e}")
+
+# 4. 제출된 응답 미리보기 페이지  [수정됨]
+elif st.session_state.page == 'submitted':
+    st.title("🎉 설문 완료!")
+    st.write(f"{st.session_state.user_name}님의 응답이 성공적으로 제출되었습니다.")
+
+    with st.expander("🔍 제출한 응답 보기"):
+        st.write(f"1. 게임이 재미있었나요? 👉 {st.session_state.get('survey_q1', '')}")
+        st.write(f"2. 난이도는 어땠나요? 👉 {st.session_state.get('survey_q2', '')}")
+        st.write(f"3. 도박 관련성? 👉 {st.session_state.get('survey_q3', '')}")
+        st.write(f"   ➕ 이유: {st.session_state.get('survey_q3_reason', '')}")
+        st.write(f"4. 도박 중독 가능성? 👉 {st.session_state.get('survey_q4', '')}")
+        st.write(f"5. 코인이 실제 돈이었다면? 👉 {st.session_state.get('survey_q5', '')}")
+
+    if st.button("🔁 다시 하기"):
+        reset_game()
+        st.session_state.user_name = ''
+        st.session_state.class_num = 1
+        st.session_state.page = 'start'
+        st.rerun()
