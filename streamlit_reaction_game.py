@@ -4,7 +4,7 @@ import random
 import datetime
 import gspread
 from google.oauth2.service_account import Credentials
-from streamlit_autorefresh import st_autorefresh  # ✅ 이 줄은 여기에 위치해야 합니다.
+from streamlit_autorefresh import st_autorefresh  # ✅ st. 없이 사용해야 함
 
 # 구글 시트 설정
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
@@ -90,7 +90,7 @@ elif st.session_state.page == 'game':
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
 
-        # 500ms마다 새로고침
+        # ✅ st_autorefresh는 st. 없이 독립적으로 사용해야 함
         st_autorefresh(interval=500, key="autorefresh")
 
         if now >= st.session_state.next_click_time:
@@ -131,7 +131,6 @@ elif st.session_state.page == 'game':
 
     if st.button("게임 종료 후 설문조사"):
         st.session_state.page = 'survey'
-
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
