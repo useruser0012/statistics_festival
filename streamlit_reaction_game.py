@@ -51,7 +51,7 @@ def play_round(class_num):
     st.session_state.tries += 1
     return message
 
-# 초기화
+# 초기 상태 설정
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'coins' not in st.session_state:
@@ -73,7 +73,9 @@ if st.session_state.page == 'start':
     st.title("게임 시작 페이지")
     st.session_state.user_name = st.text_input("이름을 입력하세요")
     st.session_state.class_num = st.number_input("반을 입력하세요 (1~10)", min_value=1, max_value=10, step=1)
-    if st.button("게임 시작") and st.session_state.user_name.strip() != "":
+    start_clicked = st.button("게임 시작")
+
+    if start_clicked and st.session_state.user_name.strip() != "":
         reset_game()
         st.session_state.page = 'game'
         st.experimental_rerun()
@@ -84,14 +86,16 @@ elif st.session_state.page == 'game':
     st.write(f"현재 코인: {st.session_state.coins}")
     st.write(f"도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
-    if st.button("카드 선택 (1/2 확률 게임)"):
+    play_clicked = st.button("카드 선택 (1/2 확률 게임)")
+    if play_clicked:
         st.session_state.result_message = play_round(st.session_state.class_num)
         st.experimental_rerun()
 
     if st.session_state.result_message:
         st.info(st.session_state.result_message)
 
-    if st.button("그만하기 및 설문조사"):
+    quit_clicked = st.button("그만하기 및 설문조사")
+    if quit_clicked:
         st.session_state.page = 'survey'
         st.experimental_rerun()
 
@@ -104,7 +108,8 @@ elif st.session_state.page == 'survey':
     q3 = st.radio("게임 중 충동을 느꼈나요?", options=["매우 충동적임", "충동적임", "보통", "충동적이지 않음"])
     q4 = st.text_area("비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
 
-    if st.button("설문 제출"):
+    submit_clicked = st.button("설문 제출")
+    if submit_clicked:
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data = [now_str, st.session_state.user_name, st.session_state.class_num,
                 st.session_state.tries, st.session_state.successes,
