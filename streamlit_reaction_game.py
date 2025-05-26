@@ -26,7 +26,6 @@ class_settings = {
     10: {"time_factor": 0.8},
 }
 
-# 실패 시 코인 손실 계산 함수
 def calculate_failure_coin_loss(tries):
     min_loss = 30
     max_loss = 120
@@ -38,7 +37,6 @@ def calculate_failure_coin_loss(tries):
         loss_max = 50 + (max_loss - 50) * (tries / max_tries_for_max_loss)
         return random.randint(int(loss_min), int(loss_max))
 
-# 초기화 함수
 def reset_game():
     st.session_state.tries = 0
     st.session_state.successes = 0
@@ -82,27 +80,41 @@ elif st.session_state.page == 'game':
     st.write(f"👤 {user_name}님 | 🏫 {class_num}반")
     st.write(f"🔁 시도: {st.session_state.tries} | ✅ 성공: {st.session_state.successes} | ❌ 실패: {st.session_state.failures} | 🪙 코인: {st.session_state.coins}")
 
-    if st.session_state.result_message:
-        st.markdown(st.session_state.result_message)
-
-    # 게임 단계
+    # 고정 높이 텍스트 박스
+    message = ""
     phase = st.session_state.phase
 
     if phase == "start":
-        st.write("버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!")
+        message = "버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!"
+    elif phase == "wait":
+        message = "준비하세요... 곧 시작됩니다!"
+    elif phase == "react":
+        message = "🟢 지금 클릭하세요!"
+    elif phase == "result":
+        message = f"⏱ 반응 속도: {st.session_state.reaction_time}초"
+
+    st.markdown(
+        f"""
+        <div style="height: 80px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+            {message}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 게임 단계별 버튼 처리
+    if phase == "start":
         if st.button("게임 시작"):
             st.session_state.phase = "wait"
             st.rerun()
 
     elif phase == "wait":
-        st.write("준비하세요... 곧 시작됩니다!")
         time.sleep(random.uniform(1.5, 3.0))
         st.session_state.start_time = time.time()
         st.session_state.phase = "react"
         st.rerun()
 
     elif phase == "react":
-        st.success("🟢 지금 클릭하세요!")
         if st.button("클릭!"):
             raw_time = time.time() - st.session_state.start_time
             reaction_time = raw_time * time_factor
@@ -123,7 +135,6 @@ elif st.session_state.page == 'game':
             st.rerun()
 
     elif phase == "result":
-        st.subheader(f"⏱ 반응 속도: {st.session_state.reaction_time}초")
         st.markdown(f"### {st.session_state.result}")
         if st.button("다시 도전"):
             st.session_state.phase = "start"
