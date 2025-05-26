@@ -77,6 +77,7 @@ elif st.session_state.page == 'game':
     st.write(f"🔁 시도: {st.session_state.tries} | ✅ 성공: {st.session_state.successes} | ❌ 실패: {st.session_state.failures} | 🪙 코인: {st.session_state.coins}")
 
     if st.session_state.result_message:
+        # 고정 높이 결과 메시지 박스 + 스크롤
         st.markdown(
             f"""
             <div style="
@@ -94,6 +95,7 @@ elif st.session_state.page == 'game':
             unsafe_allow_html=True
         )
     else:
+        # 결과 메시지가 없을 땐 빈 박스 자리 확보
         st.markdown(
             """
             <div style="
@@ -107,6 +109,7 @@ elif st.session_state.page == 'game':
 
     phase = st.session_state.phase
 
+    # 버튼 고정 크기 스타일 지정
     button_style = """
         <style>
         div.stButton > button {
@@ -123,20 +126,14 @@ elif st.session_state.page == 'game':
         st.write("버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!")
         if st.button("게임 시작"):
             st.session_state.phase = "wait"
-            st.session_state.wait_start_time = time.time()
+            st.experimental_rerun()
 
     elif phase == "wait":
         st.write("준비하세요... 곧 시작됩니다!")
-        elapsed = time.time() - st.session_state.wait_start_time
-        wait_duration = random.uniform(1.5, 3.0)
-        remaining = wait_duration - elapsed
-        if remaining <= 0:
-            st.session_state.start_time = time.time()
-            st.session_state.phase = "react"
-            del st.session_state['wait_start_time']
-            st.experimental_rerun()
-        else:
-            st.write(f"{remaining:.1f}초 후 시작합니다...")
+        time.sleep(random.uniform(1.5, 3.0))
+        st.session_state.start_time = time.time()
+        st.session_state.phase = "react"
+        st.experimental_rerun()
 
     elif phase == "react":
         st.success("🟢 지금 클릭하세요!")
@@ -164,6 +161,7 @@ elif st.session_state.page == 'game':
         if st.button("다시 도전"):
             st.session_state.phase = "start"
             st.session_state.result_message = ""
+            st.experimental_rerun()
 
     if st.session_state.tries >= 1000:
         st.write("📊 최대 시도에 도달했습니다. 설문조사로 이동합니다.")
