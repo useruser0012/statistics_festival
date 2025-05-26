@@ -17,32 +17,47 @@ def reset_game():
     st.session_state.failures = 0
     st.session_state.tries = 0
 
-def get_success_probability(class_num):
+def get_dynamic_success_probability(class_num, tries):
+    """
+    1,3,5,7,9반은 초기 성공률 높다가 점점 내려가는 도박 패턴.
+    다른 반은 고정 확률 유지.
+    """
     if class_num in [1,3,5,7,9]:
-        return 0.4
+        max_tries = 30
+        initial_prob = 0.7
+        min_prob = 0.1
+        # 선형 감소
+        prob = initial_prob - (tries / max_tries) * (initial_prob - min_prob)
+        prob = max(prob, min_prob)
+        # 랜덤 노이즈 추가 (-0.05 ~ +0.05)
+        noise = random.uniform(-0.05, 0.05)
+        prob = min(max(prob + noise, 0), 1)
+        return prob
     elif class_num in [2,6,10]:
         return 0.2
     elif class_num in [4,8]:
         return 0.9
     else:
-        return 0.5  # 기본값
+        return 0.5
 
 def play_round(class_num):
-    prob = get_success_probability(class_num)
+    prob = get_dynamic_success_probability(class_num, st.session_state.tries)
     success_flag = random.random() < prob
     coin_change = random.randint(30, 120)
+
     if success_flag:
         st.session_state.coins += coin_change
         st.session_state.successes += 1
-        message = f"성공! 코인이 +{coin_change} 만큼 증가했습니다."
+        message = f"성공! 코인이 +{coin_change} 만큼 증가했습니다. (성공확률: {prob:.2f})"
     else:
         st.session_state.coins -= coin_change
         st.session_state.failures += 1
-        message = f"실패... 코인이 -{coin_change} 만큼 감소했습니다."
+        message = f"실패... 코인이 -{coin_change} 만큼 감소했습니다. (성공확률: {prob:.2f})"
+
     st.session_state.tries += 1
     return message
 
-# --- 세션 상태 초기화 ---
+# --- Streamlit UI 및 흐름 관리 ---
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'coins' not in st.session_state:
@@ -58,7 +73,6 @@ if 'failures' not in st.session_state:
 if 'tries' not in st.session_state:
     st.session_state.tries = 0
 
-# --- 페이지별 UI 및 로직 ---
 if st.session_state.page == 'start':
     st.title("게임 시작 페이지")
     st.session_state.user_name = st.text_input("이름을 입력하세요")
@@ -79,7 +93,7 @@ elif st.session_state.page == 'game':
         st.write(result_message)
         st.write(f"현재 코인: {st.session_state.coins}")
 
-    if st.button("그만하기 (게임 종료 및 설문조사)"):
+    if st.button("그만하기 및 설문조사"):
         st.session_state.page = 'survey'
         st.experimental_rerun()
 
@@ -94,27 +108,13 @@ elif st.session_state.page == 'survey':
 
     if st.button("설문 제출"):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data = [
-            now_str,
-            st.session_state.user_name,
-            st.session_state.class_num,
-            st.session_state.tries,
-            st.session_state.successes,
-            st.session_state.failures,
-            st.session_state.coins,
-            q1,
-            q2,
-            q3,
-            q4
-        ]
+        data = [now_str, st.session_state.user_name, st.session_state.class_num,
+                st.session_state.tries, st.session_state.successes,
+                st.session_state.failures, st.session_state.coins,
+                q1, q2, q3, q4]
+
         try:
             sheet.append_row(data)
             st.success("설문이 제출되었습니다! 감사합니다.")
-            # 초기화 및 페이지 전환
-            reset_game()
-            st.session_state.user_name = ''
-            st.session_state.class_num = 1
-            st.session_state.page = 'start'
-            st.experimental_rerun()
         except Exception as e:
             st.error(f"설문 제출 중 오류 발생: {e}")
