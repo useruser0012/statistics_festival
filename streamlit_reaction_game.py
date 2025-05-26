@@ -22,7 +22,7 @@ def get_success_probability(class_num):
     if class_num in [1, 3, 5, 7, 9]:
         return 0.5
     elif class_num in [2, 6, 10]:
-        return 0.2
+        return 0.1
     elif class_num in [4, 8]:
         return 0.9
     else:
