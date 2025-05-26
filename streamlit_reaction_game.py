@@ -143,7 +143,7 @@ elif st.session_state.page == 'game':
     if st.session_state.page == 'game':
         if st.button("게임 종료 후 설문조사"):
             st.session_state.page = 'survey'
-             st.experimental_rerun()
+            st.experimental_rerun()
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
