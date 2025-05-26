@@ -4,6 +4,55 @@ import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
+# 🎨 조커 테마 스타일 추가
+st.markdown("""
+<style>
+[data-testid="stAppViewContainer"] {
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/2/27/Playing_card_joker_artistic.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    color: white;
+}
+
+[data-testid="stAppViewContainer"] .block-container {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+h1, h2, h3, h4, h5 {
+    color: #ffd700;
+    text-shadow: 1px 1px 3px #000;
+}
+
+button {
+    background-color: #ff4757 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# 🎰 조커 느낌의 폰트 적용
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+html, body, [class*="css"] {
+    font-family: 'Playfair Display', serif;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# 🃏 게임 제목
+st.title("🃏 조커의 반응속도 챌린지")
+st.markdown("조커가 속삭인다... **얼마나 빠른지 보자꾸나!** 🎩")
+
+
 # 구글 스프레드시트 연결
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
