@@ -82,7 +82,6 @@ elif st.session_state.page == 'game':
 
     if st.button("카드 선택 (1/2 확률 게임)"):
         result_message = play_round(st.session_state.class_num)
-        st.write(result_message)
         st.write(f"현재 코인: {st.session_state.coins}")
 
     if st.button("그만하기 (게임 종료 및 설문조사)"):
