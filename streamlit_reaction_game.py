@@ -6,10 +6,11 @@ from google.oauth2.service_account import Credentials
 
 # --- 구글 스프레드시트 연결 설정 ---
 # JSON 파일 경로 및 시트 이름은 실제 환경에 맞게 수정하세요
-SCOPE = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-CREDS = Credentials.from_service_account_file('your-google-credentials.json', scopes=SCOPE)
-CLIENT = gspread.authorize(CREDS)
-SHEET = CLIENT.open('YourGoogleSheetName').sheet1
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
+client = gspread.authorize(creds)
+sheet = client.open("도파민 타이밍 게임 기록").sheet1
+
 
 # --- 초기화 함수 ---
 def reset_game():
