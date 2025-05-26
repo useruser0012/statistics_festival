@@ -121,7 +121,7 @@ elif st.session_state.page == 'game':
             st.session_state.reaction_time = round(reaction_time, 3)
             st.session_state.tries += 1
 
-            if reaction_time > 5.0:
+            if reaction_time > 3.0:
                 st.session_state.failures += 1
                 loss = calculate_failure_coin_loss(st.session_state.tries)
                 st.session_state.coins -= loss
