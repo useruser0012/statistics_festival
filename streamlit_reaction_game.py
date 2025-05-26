@@ -135,11 +135,11 @@ def play_round(class_num):
     if success_flag:
         st.session_state.coins += coin_change
         st.session_state.successes += 1
-        message = f"✅ 성공! 코인이 +{coin_change} 만큼 증가했습니다."
+        message = f"✅ 성공이군! 코인이 +{coin_change} 만큼 증가했다."
     else:
         st.session_state.coins -= coin_change
         st.session_state.failures += 1
-        message = f"❌ 실패... 코인이 -{coin_change} 만큼 감소했습니다."
+        message = f"❌ 낄낄낄 실패! 코인이 -{coin_change} 만큼 감소했다."
     st.session_state.tries += 1
     return message
 
