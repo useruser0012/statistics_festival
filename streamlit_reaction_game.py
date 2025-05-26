@@ -46,41 +46,36 @@ def reset_game():
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
 
-# 세션 상태 초기화 (없는 키만 초기화)
-for key, default_value in {
-    "page": "start",
-    "user_name": "",
-    "class_num": 1,
-    "tries": 0,
-    "successes": 0,
-    "failures": 0,
-    "coins": 10,
-    "state": "ready",
-    "next_click_time": 0,
-    "reaction_start_time": 0,
-    "result_message": "",
-}.items():
-    if key not in st.session_state:
-        st.session_state[key] = default_value
+# 세션 상태 초기화 안전하게 한 번만
+if 'page' not in st.session_state:
+    st.session_state.page = 'start'
+if 'user_name' not in st.session_state:
+    st.session_state.user_name = ""
+if 'class_num' not in st.session_state:
+    st.session_state.class_num = 1
+if 'tries' not in st.session_state:
+    reset_game()
 
+# --- 페이지별 처리 ---
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
     st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num-1)
+    
     if st.button("게임 시작"):
         if not st.session_state.user_name.strip():
             st.warning("이름을 입력해 주세요.")
         else:
             reset_game()
             st.session_state.page = 'game'
-            st.experimental_rerun()
-            st.stop()
+            st.experimental_rerun()  # 버튼 클릭 이벤트 내부에서 안전하게 호출
+    st.stop()
 
 elif st.session_state.page == 'game':
     st.title("도파민 타이밍 게임 진행 중")
     user_name = st.session_state.user_name
     class_num = st.session_state.class_num
-    time_factor = class_settings[class_num]["time_factor"]
+    time_factor = class_settings.get(class_num, {"time_factor":1.0})["time_factor"]
 
     st.write(f"{user_name}님, {class_num}반 게임 중입니다.")
     st.write(f"총 시도: {st.session_state.tries} | 성공: {st.session_state.successes} | 실패: {st.session_state.failures} | 코인: {st.session_state.coins}")
@@ -98,7 +93,7 @@ elif st.session_state.page == 'game':
             st.session_state.result_message = ""
             st.session_state.tries += 1
             st.experimental_rerun()
-            st.stop()
+        st.stop()
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
@@ -106,7 +101,7 @@ elif st.session_state.page == 'game':
             st.session_state.state = 'click_now'
             st.session_state.reaction_start_time = now
             st.experimental_rerun()
-            st.stop()
+        st.stop()
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
@@ -136,7 +131,7 @@ elif st.session_state.page == 'game':
 
             st.session_state.state = 'ready'
             st.experimental_rerun()
-            st.stop()
+        st.stop()
 
     if st.session_state.tries >= 1000:
         st.write("최대 시도 횟수에 도달했습니다. 설문조사 페이지로 이동합니다.")
@@ -161,14 +156,20 @@ elif st.session_state.page == 'survey':
     if st.button("설문 제출"):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data = [now_str, st.session_state.user_name, st.session_state.class_num,
-                st.session_state.tries, st.session_state.successes, st.session_state.failures, st.session_state.coins,
+                st.session_state.tries, st.session_state.successes,
+                st.session_state.failures, st.session_state.coins,
                 q1, q2, q3, q4]
+
         try:
             sheet.append_row(data)
-            st.success("설문이 제출되었습니다. 감사합니다!")
-            st.session_state.page = 'start'
-            st.experimental_rerun()
-            st.stop()
+            st.success("설문이 제출되었습니다! 감사합니다.")
         except Exception as e:
-            st.error(f"제출 중 오류가 발생했습니다: {e}")
+            st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
 
+        # 설문 제출 후 상태 초기화 및 시작 페이지로
+        st.session_state.page = "start"
+        st.session_state.user_name = ""
+        st.session_state.class_num = 1
+        reset_game()
+        st.experimental_rerun()
+    st.stop()
