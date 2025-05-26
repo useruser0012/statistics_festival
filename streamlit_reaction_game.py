@@ -12,7 +12,7 @@ creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"],
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
-# 반별 시간 조작 비율 (반응시간에 곱함)
+# 반별 시간 조작 비율
 class_settings = {
     1: {"time_factor": 1.0},
     2: {"time_factor": 0.8},
@@ -26,7 +26,6 @@ class_settings = {
     10: {"time_factor": 0.8},
 }
 
-# 실패 시 코인 손실 계산
 def calculate_failure_coin_loss(tries):
     min_loss = 30
     max_loss = 120
@@ -43,34 +42,35 @@ def reset_game():
     st.session_state.successes = 0
     st.session_state.failures = 0
     st.session_state.coins = 10
-    st.session_state.state = 'ready'  # ready, waiting, click_now
+    st.session_state.state = 'ready'
     st.session_state.next_click_time = 0
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
 
+# 초기 상태
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
-
 if 'user_name' not in st.session_state:
     st.session_state.user_name = ""
-
 if 'class_num' not in st.session_state:
     st.session_state.class_num = 1
-
 if 'tries' not in st.session_state:
     reset_game()
+if 'page_change_flag' not in st.session_state:
+    st.session_state.page_change_flag = False
 
 # 시작 페이지
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
-    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num-1)
+    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num - 1)
     if st.button("게임 시작"):
         if not st.session_state.user_name.strip():
             st.warning("이름을 입력해 주세요.")
         else:
             reset_game()
             st.session_state.page = 'game'
+            st.experimental_rerun()
 
 # 게임 페이지
 elif st.session_state.page == 'game':
@@ -100,9 +100,6 @@ elif st.session_state.page == 'game':
         if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
             st.session_state.reaction_start_time = time.time()
-           
-        else:
-            # 짧은 시간 후 자동 새로고침으로 상태 체크 지속
             st.experimental_rerun()
 
     elif st.session_state.state == 'click_now':
@@ -112,7 +109,6 @@ elif st.session_state.page == 'game':
 
             st.write(f"반응시간: {reaction_time:.3f}초")
 
-            # 성공/실패 판정
             if reaction_time < 0.2:
                 st.warning("너무 빨리 클릭하셨습니다! 실패 처리됩니다.")
                 st.session_state.failures += 1
@@ -133,17 +129,16 @@ elif st.session_state.page == 'game':
                 st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
 
             st.session_state.state = 'ready'
+            st.experimental_rerun()
 
-    # 최대 시도 제한
     if st.session_state.tries >= 1000:
         st.write("최대 시도 횟수에 도달했습니다. 설문조사 페이지로 이동합니다.")
         st.session_state.page = 'survey'
+        st.experimental_rerun()
 
-    # 게임 중 설문조사 버튼
-    if st.session_state.page == 'game':
-        if st.button("게임 종료 후 설문조사"):
-            st.session_state.page = 'survey'
-            st.experimental_rerun()
+    if st.button("게임 종료 후 설문조사"):
+        st.session_state.page = 'survey'
+        st.experimental_rerun()
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
@@ -173,3 +168,4 @@ elif st.session_state.page == 'survey':
         st.session_state.user_name = ""
         st.session_state.class_num = 1
         reset_game()
+        st.experimental_rerun()
