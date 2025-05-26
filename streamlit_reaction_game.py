@@ -26,6 +26,8 @@ def init_session_state():
         st.session_state.result_message = ""
     if 'success_rate' not in st.session_state:
         st.session_state.success_rate = 0.5  # 기본 성공률 50%
+    if 'wait_until' not in st.session_state:
+        st.session_state.wait_until = 0  # 대기 종료 시간
 
 init_session_state()
 
@@ -61,13 +63,15 @@ if st.session_state.page == 'start':
             st.session_state.state = 'ready'
             st.session_state.result_message = ""
             st.session_state.page = 'game'
-            st.experimental_rerun()  # 페이지 이동 즉시 반영
+            st.experimental_rerun()
             st.stop()
 
 elif st.session_state.page == 'game':
     st.header(f"도파민 타이밍 게임 진행 중\n{st.session_state.user_name}님, {st.session_state.class_num}반 게임 중입니다.")
     st.write(f"총 시도: {st.session_state.tries} | 성공: {st.session_state.successes} | 실패: {st.session_state.failures} | 코인: {st.session_state.coins}")
-    st.write(st.session_state.result_message)
+
+    if st.session_state.result_message:
+        st.write(st.session_state.result_message)
 
     if st.session_state.state == 'ready':
         if st.button("준비 완료, 시작!"):
@@ -86,7 +90,7 @@ elif st.session_state.page == 'game':
             st.stop()
         else:
             st.write("잠시만 기다려주세요...")
-            time.sleep(0.1)
+            # time.sleep(0.1) 삭제 — Streamlit에선 권장 안됨
             st.experimental_rerun()
             st.stop()
 
