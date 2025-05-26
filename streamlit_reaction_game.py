@@ -109,7 +109,7 @@ elif st.session_state.page == 'game':
             st.rerun()
 
     elif phase == "wait":
-        time.sleep(random.uniform(1.5, 3.0))
+        time.sleep(random.uniform(0.5, 1.0))
         st.session_state.start_time = time.time()
         st.session_state.phase = "react"
         st.rerun()
