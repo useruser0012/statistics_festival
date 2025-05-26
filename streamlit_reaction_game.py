@@ -1,6 +1,6 @@
 import streamlit as st
-import time
 import random
+import time
 import datetime
 
 import gspread
@@ -47,6 +47,7 @@ def reset_game():
     st.session_state.start_time = None
     st.session_state.reaction_time = None
     st.session_state.result = ""
+    st.session_state.wait_start_time = None  # 대기 시작 시간
 
 # 세션 초기화
 if 'page' not in st.session_state:
@@ -57,6 +58,8 @@ if 'class_num' not in st.session_state:
     st.session_state.class_num = 1
 if 'tries' not in st.session_state:
     reset_game()
+
+phase = st.session_state.phase  # phase 변수 바로 가져오기
 
 # 시작 페이지
 if st.session_state.page == 'start':
@@ -69,6 +72,7 @@ if st.session_state.page == 'start':
         else:
             reset_game()
             st.session_state.page = 'game'
+            st.experimental_rerun()
 
 # 게임 페이지
 elif st.session_state.page == 'game':
@@ -80,10 +84,7 @@ elif st.session_state.page == 'game':
     st.write(f"👤 {user_name}님 | 🏫 {class_num}반")
     st.write(f"🔁 시도: {st.session_state.tries} | ✅ 성공: {st.session_state.successes} | ❌ 실패: {st.session_state.failures} | 🪙 코인: {st.session_state.coins}")
 
-    # 고정 높이 텍스트 박스
     message = ""
-    phase = st.session_state.phase
-
     if phase == "start":
         message = "버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!"
     elif phase == "wait":
@@ -102,17 +103,24 @@ elif st.session_state.page == 'game':
         unsafe_allow_html=True
     )
 
-    # 게임 단계별 버튼 처리
+    # phase별 동작
     if phase == "start":
         if st.button("게임 시작"):
+            # 대기 시작 시간 저장 (현재 시간 + 랜덤 딜레이)
+            st.session_state.wait_start_time = time.time() + random.uniform(1.5, 3.0)
             st.session_state.phase = "wait"
             st.experimental_rerun()
 
     elif phase == "wait":
-        time.sleep(random.uniform(1.5, 3.0))
-        st.session_state.start_time = time.time()
-        st.session_state.phase = "react"
-        st.experimental_rerun()
+        now = time.time()
+        # 아직 대기 시간이 지나지 않았으면 멈춤
+        if now < st.session_state.wait_start_time:
+            st.write("잠시만 기다려 주세요...")
+            st.stop()
+        else:
+            st.session_state.start_time = time.time()
+            st.session_state.phase = "react"
+            st.experimental_rerun()
 
     elif phase == "react":
         if st.button("클릭!"):
@@ -144,9 +152,11 @@ elif st.session_state.page == 'game':
     if st.session_state.tries >= 1000:
         st.write("📊 최대 시도에 도달했습니다. 설문조사로 이동합니다.")
         st.session_state.page = 'survey'
+        st.experimental_rerun()
 
     if st.button("게임 종료 후 설문조사"):
         st.session_state.page = 'survey'
+        st.experimental_rerun()
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
@@ -175,3 +185,4 @@ elif st.session_state.page == 'survey':
         st.session_state.user_name = ""
         st.session_state.class_num = 1
         reset_game()
+        st.experimental_rerun()
