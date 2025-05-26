@@ -88,28 +88,28 @@ elif st.session_state.page == 'game':
         st.markdown(st.session_state.result_message)
 
     now = time.time()
-
-    if st.session_state.state == 'ready':
-        if st.button("시작"):
-            delay = random.uniform(0.05, 0.5)
-            st.session_state.next_click_time = now + delay
-            st.session_state.state = 'waiting'
-            st.session_state.result_message = ""
-            st.session_state.tries += 1
-            st.experimental_rerun()  # 상태변경 후 즉시 rerun
-
-    elif st.session_state.state == 'waiting':
-        st.write("준비 중... 잠시만 기다려주세요.")
-        if now >= st.session_state.next_click_time:
-            st.session_state.state = 'click_now'
-            st.session_state.reaction_start_time = time.time()
-            st.experimental_rerun()  # 상태 변경 후 즉시 rerun
-        # 조건이 안 되면 그냥 대기 상태 유지, rerun 호출 안 함!
-
-    elif st.session_state.state == 'click_now':
-        if st.button("클릭!"):
-            raw_reaction_time = time.time() - st.session_state.reaction_start_time
-            reaction_time = raw_reaction_time * time_factor
+if st.session_state.state == 'ready':
+    if st.button("시작"):
+        delay = random.uniform(0.05, 0.5)
+        st.session_state.next_click_time = time.time() + delay
+        st.session_state.state = 'waiting'
+        st.session_state.result_message = ""
+        st.session_state.tries += 1
+        st.experimental_rerun()  # 여기선 상태 변경이므로 rerun 호출
+elif st.session_state.state == 'waiting':
+    st.write("준비 중... 잠시만 기다려주세요.")
+    if time.time() >= st.session_state.next_click_time:
+        st.session_state.state = 'click_now'
+        st.session_state.reaction_start_time = time.time()
+        st.experimental_rerun()  # 상태 변경이므로 rerun 호출
+    # else: rerun 호출 안 함 => 무한 호출 방지
+elif st.session_state.state == 'click_now':
+    if st.button("클릭!"):
+        raw_reaction_time = time.time() - st.session_state.reaction_start_time
+        reaction_time = raw_reaction_time * time_factor
+        # 처리 로직...
+        st.session_state.state = 'ready'
+        st.experimental_rerun()  # 상태 변경이므로 rerun 호출
 
             st.write(f"반응시간: {reaction_time:.3f}초")
 
