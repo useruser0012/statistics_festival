@@ -115,17 +115,17 @@ elif st.session_state.page == 'game':
         st.rerun()
 
     elif phase == "react":
-        if st.button("클릭!"):
+        if st.button("지금 클릭!"):
             raw_time = time.time() - st.session_state.start_time
             reaction_time = raw_time * time_factor
             st.session_state.reaction_time = round(reaction_time, 3)
             st.session_state.tries += 1
 
-            if reaction_time > 2.7:
+            if reaction_time > 2.5:
                 st.session_state.failures += 1
                 loss = calculate_failure_coin_loss(st.session_state.tries)
                 st.session_state.coins -= loss
-                st.session_state.result = f"❌ 2.7초 초과로 실패! 코인 {loss}개 손실."
+                st.session_state.result = f"❌ 2.5초 초과로 실패! 코인 {loss}개 손실."
             else:
                 st.session_state.successes += 1
                 gain = random.randint(30, 100)
