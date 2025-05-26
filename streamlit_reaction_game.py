@@ -5,12 +5,10 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # --- 구글 스프레드시트 연결 설정 ---
-# JSON 파일 경로 및 시트 이름은 실제 환경에 맞게 수정하세요
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
-
 
 # --- 초기화 함수 ---
 def reset_game():
@@ -27,13 +25,11 @@ def get_success_probability(class_num):
     elif class_num in [4,8]:
         return 0.9
     else:
-        return 0.5  # 혹시 모를 기본값
+        return 0.5  # 기본값
 
 def play_round(class_num):
     prob = get_success_probability(class_num)
-    # 성공 여부 결정
     success_flag = random.random() < prob
-    # 랜덤 코인 변화량 (30~120)
     coin_change = random.randint(30, 120)
     
     if success_flag:
@@ -48,7 +44,7 @@ def play_round(class_num):
     st.session_state.tries += 1
     return message
 
-# --- Streamlit UI 및 흐름 관리 ---
+# --- 세션 상태 초기 설정 ---
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'coins' not in st.session_state:
@@ -64,6 +60,7 @@ if 'failures' not in st.session_state:
 if 'tries' not in st.session_state:
     st.session_state.tries = 0
 
+# --- 페이지별 화면 처리 ---
 if st.session_state.page == 'start':
     st.title("게임 시작 페이지")
     st.session_state.user_name = st.text_input("이름을 입력하세요")
@@ -84,7 +81,7 @@ elif st.session_state.page == 'game':
         st.write(result_message)
         st.write(f"현재 코인: {st.session_state.coins}")
 
-    if st.button("게임 종료 및 설문조사"):
+    if st.button("그만하기"):
         st.session_state.page = 'survey'
         st.experimental_rerun()
 
@@ -97,21 +94,21 @@ elif st.session_state.page == 'survey':
     q3 = st.radio("게임 중 충동을 느꼈나요?", options=["매우 충동적임", "충동적임", "보통", "충동적이지 않음"])
     q4 = st.text_area("비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
 
-   if st.button("설문 제출"):
-       now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-       data = [now_str, st.session_state.user_name, st.session_state.class_num,
-            st.session_state.tries, st.session_state.successes,
-            st.session_state.failures, st.session_state.coins,
-            q1, q2, q3, q4]
+    if st.button("설문 제출"):
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data = [now_str, st.session_state.user_name, st.session_state.class_num,
+                st.session_state.tries, st.session_state.successes,
+                st.session_state.failures, st.session_state.coins,
+                q1, q2, q3, q4]
+        try:
+            sheet.append_row(data)
+            st.success("설문이 제출되었습니다! 감사합니다.")
+        except Exception as e:
+            st.error(f"설문 제출 중 오류 발생: {e}")
 
-    try:
-        sheet.append_row(data)
-        st.success("설문이 제출되었습니다! 감사합니다.")
-    except Exception as e:
-        st.error(f"설문 제출 중 오류 발생: {e}")
-
-    st.session_state.page = "start"
-    st.session_state.user_name = ""
-    st.session_state.class_num = 1
-    reset_game()
-    st.experimental_rerun()
+        # 게임 초기화 및 시작 페이지로 이동
+        reset_game()
+        st.session_state.user_name = ''
+        st.session_state.class_num = 1
+        st.session_state.page = 'start'
+        st.experimental_rerun()
