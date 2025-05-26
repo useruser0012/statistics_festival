@@ -2,11 +2,9 @@ import streamlit as st
 import time
 import random
 import datetime
+
 import gspread
 from google.oauth2.service_account import Credentials
-
-# st_autorefresh 설치 필요 (pip install streamlit-autorefresh)
-from streamlit_autorefresh import st_autorefresh
 
 # 구글 API 설정
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
@@ -28,6 +26,7 @@ class_settings = {
     10: {"time_factor": 0.8},
 }
 
+# 실패 시 코인 손실 계산
 def calculate_failure_coin_loss(tries):
     min_loss = 30
     max_loss = 120
@@ -48,16 +47,16 @@ def reset_game():
     st.session_state.next_click_time = 0
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
-    st.session_state.start_clicked = False
-    st.session_state.clicked = False
 
-# 세션 상태 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
+
 if 'user_name' not in st.session_state:
     st.session_state.user_name = ""
+
 if 'class_num' not in st.session_state:
     st.session_state.class_num = 1
+
 if 'tries' not in st.session_state:
     reset_game()
 
@@ -88,72 +87,59 @@ elif st.session_state.page == 'game':
 
     now = time.time()
 
-    # 자동 새로고침 (200ms) — waiting 상태일 때만 동작
-    if st.session_state.state == 'waiting':
-        st_autorefresh(interval=200, key="auto_refresh")
-
     if st.session_state.state == 'ready':
-        if not st.session_state.start_clicked:
-            if st.button("시작"):
-                delay = random.uniform(0.05, 0.5)
-                st.session_state.next_click_time = now + delay
-                st.session_state.state = 'waiting'
-                st.session_state.result_message = ""
-                st.session_state.tries += 1
-                st.session_state.start_clicked = True
-                st.session_state.clicked = False
+        if st.button("시작"):
+            delay = random.uniform(0.5, 1.5)  # 적당한 지연시간 (0.05초보다는 좀 길게)
+            st.session_state.next_click_time = now + delay
+            st.session_state.state = 'waiting'
+            st.session_state.result_message = ""
+            st.session_state.tries += 1
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
-        # 시간 도달 시 상태 변경
+        # 시간 체크해서 딜레이 끝나면 상태 변경
         if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
             st.session_state.reaction_start_time = time.time()
-            st.session_state.start_clicked = False  # 다음 시작 준비
-            st.experimental_rerun()  # 즉시 화면 갱신
 
     elif st.session_state.state == 'click_now':
-        if not st.session_state.clicked:
-            if st.button("클릭!"):
-                raw_reaction_time = time.time() - st.session_state.reaction_start_time
-                reaction_time = raw_reaction_time * time_factor
+        if st.button("클릭!"):
+            raw_reaction_time = time.time() - st.session_state.reaction_start_time
+            reaction_time = raw_reaction_time * time_factor
 
-                st.write(f"반응시간: {reaction_time:.3f}초")
+            st.write(f"반응시간: {reaction_time:.3f}초")
 
-                if reaction_time < 0.2:
-                    st.warning("너무 빨리 클릭하셨습니다! 실패 처리됩니다.")
-                    st.session_state.failures += 1
-                    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                    st.session_state.coins -= coin_loss
-                    st.session_state.result_message = f"너무 빠른 클릭으로 실패! 코인 {coin_loss}개 손실."
-                elif reaction_time > 1.5:
-                    st.warning("너무 늦게 클릭하셨습니다! 실패 처리됩니다.")
-                    st.session_state.failures += 1
-                    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                    st.session_state.coins -= coin_loss
-                    st.session_state.result_message = f"너무 늦은 클릭으로 실패! 코인 {coin_loss}개 손실."
-                else:
-                    st.success("성공했습니다!")
-                    st.session_state.successes += 1
-                    coin_gain = random.randint(30, 100)
-                    st.session_state.coins += coin_gain
-                    st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
+            # 성공/실패 판정
+            if reaction_time < 0.2:
+                st.warning("너무 빨리 클릭하셨습니다! 실패 처리됩니다.")
+                st.session_state.failures += 1
+                coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+                st.session_state.coins -= coin_loss
+                st.session_state.result_message = f"너무 빠른 클릭으로 실패! 코인 {coin_loss}개 손실."
+            elif reaction_time > 1.5:
+                st.warning("너무 늦게 클릭하셨습니다! 실패 처리됩니다.")
+                st.session_state.failures += 1
+                coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+                st.session_state.coins -= coin_loss
+                st.session_state.result_message = f"너무 늦은 클릭으로 실패! 코인 {coin_loss}개 손실."
+            else:
+                st.success("성공했습니다!")
+                st.session_state.successes += 1
+                coin_gain = random.randint(30, 100)
+                st.session_state.coins += coin_gain
+                st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
 
-                st.session_state.state = 'ready'
-                st.session_state.clicked = True
-                st.experimental_rerun()  # 즉시 화면 갱신
+            st.session_state.state = 'ready'
 
     # 최대 시도 제한
     if st.session_state.tries >= 1000:
         st.write("최대 시도 횟수에 도달했습니다. 설문조사 페이지로 이동합니다.")
         st.session_state.page = 'survey'
-        st.experimental_rerun()
 
     # 게임 중 설문조사 버튼
     if st.session_state.page == 'game':
         if st.button("게임 종료 후 설문조사"):
             st.session_state.page = 'survey'
-            st.experimental_rerun()
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
@@ -183,4 +169,3 @@ elif st.session_state.page == 'survey':
         st.session_state.user_name = ""
         st.session_state.class_num = 1
         reset_game()
-        st.experimental_rerun()
