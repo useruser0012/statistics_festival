@@ -128,12 +128,13 @@ if st.session_state.page == 'start':
     user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
     class_num = st.number_input("반을 입력하세요 (1~10)", min_value=1, max_value=10, step=1, value=st.session_state.class_num)
     
-    if st.button("게임 시작") and user_name.strip() != "":
-        st.session_state.user_name = user_name.strip()
-        st.session_state.class_num = class_num
-        reset_game()
-        st.session_state.page = 'game'
-        st.experimental_rerun()
+ if st.button("게임 시작") and user_name.strip() != "":
+    st.session_state.user_name = user_name.strip()
+    st.session_state.class_num = class_num
+    reset_game()
+    st.session_state.page = 'game'
+    st.experimental_rerun()
+
 
 # 2. 게임 페이지
 elif st.session_state.page == 'game':
