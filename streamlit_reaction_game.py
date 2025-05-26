@@ -12,6 +12,7 @@ creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"],
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
+# 반별 시간 조작 비율
 class_settings = {
     1: {"time_factor": 1.0},
     2: {"time_factor": 0.8},
@@ -44,10 +45,10 @@ def reset_game():
     st.session_state.result_message = ""
     st.session_state.phase = "start"
     st.session_state.start_time = None
-    st.session_state.wait_start_time = None
     st.session_state.reaction_time = None
     st.session_state.result = ""
 
+# 세션 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'user_name' not in st.session_state:
@@ -57,6 +58,7 @@ if 'class_num' not in st.session_state:
 if 'tries' not in st.session_state:
     reset_game()
 
+# 시작 페이지
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
@@ -68,6 +70,7 @@ if st.session_state.page == 'start':
             reset_game()
             st.session_state.page = 'game'
 
+# 게임 페이지
 elif st.session_state.page == 'game':
     st.title("도파민 타이밍 게임")
     user_name = st.session_state.user_name
@@ -77,8 +80,9 @@ elif st.session_state.page == 'game':
     st.write(f"👤 {user_name}님 | 🏫 {class_num}반")
     st.write(f"🔁 시도: {st.session_state.tries} | ✅ 성공: {st.session_state.successes} | ❌ 실패: {st.session_state.failures} | 🪙 코인: {st.session_state.coins}")
 
-    phase = st.session_state.phase
+    # 고정 높이 텍스트 박스
     message = ""
+    phase = st.session_state.phase
 
     if phase == "start":
         message = "버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!"
@@ -98,36 +102,22 @@ elif st.session_state.page == 'game':
         unsafe_allow_html=True
     )
 
-    # 단계별 처리
+    # 게임 단계별 버튼 처리
     if phase == "start":
         if st.button("게임 시작"):
             st.session_state.phase = "wait"
-            st.session_state.wait_start_time = time.time()
             st.experimental_rerun()
 
     elif phase == "wait":
-        # 경과 시간 계산
-        elapsed = time.time() - st.session_state.wait_start_time
-        wait_duration = st.session_state.get('wait_duration', None)
-        if wait_duration is None:
-            wait_duration = random.uniform(1.5, 3.0)
-            st.session_state.wait_duration = wait_duration
-
-        remaining = wait_duration - elapsed
-        st.write(f"준비 중... {remaining:.2f}초 남음")
-
-        if elapsed >= wait_duration:
-            st.session_state.phase = "react"
-            st.session_state.start_time = time.time()
-            st.session_state.wait_duration = None
-            st.experimental_rerun()
+        time.sleep(random.uniform(1.5, 3.0))
+        st.session_state.start_time = time.time()
+        st.session_state.phase = "react"
+        st.experimental_rerun()
 
     elif phase == "react":
-        if st.button("지금 클릭!"):
+        if st.button("클릭!"):
             raw_time = time.time() - st.session_state.start_time
             reaction_time = raw_time * time_factor
-            if reaction_time < 0:
-                reaction_time = 0
             st.session_state.reaction_time = round(reaction_time, 3)
             st.session_state.tries += 1
 
@@ -148,6 +138,7 @@ elif st.session_state.page == 'game':
         st.markdown(f"### {st.session_state.result}")
         if st.button("다시 도전"):
             st.session_state.phase = "start"
+            st.session_state.result_message = st.session_state.result
             st.experimental_rerun()
 
     if st.session_state.tries >= 1000:
@@ -157,6 +148,7 @@ elif st.session_state.page == 'game':
     if st.button("게임 종료 후 설문조사"):
         st.session_state.page = 'survey'
 
+# 설문조사 페이지
 elif st.session_state.page == 'survey':
     st.title("설문조사")
     st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
