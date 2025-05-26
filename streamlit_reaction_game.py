@@ -5,7 +5,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # 🎨 배경 이미지 URL (더 화려한 조커 카드 배경)
-background_url = https://search.pstatic.net/sunny/?src=https%3A%2F%2Fi.scdn.co%2Fimage%2Fab67616d0000b27329e32f49d79fbf1c5621192e&type=sc960_832  # 원하면 다른 이미지로 교체 가능
+background_url = "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fi.scdn.co%2Fimage%2Fab67616d0000b27329e32f49d79fbf1c5621192e&type=sc960_832"  # 원하면 다른 이미지로 교체 가능
 
 # 💄 스타일 설정 (조커 느낌 + 화려함)
 st.markdown(f"""
