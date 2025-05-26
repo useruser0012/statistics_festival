@@ -100,7 +100,7 @@ button {
 }
 
 </style>
-""", unsafe_allow_html=Tr지 보자꾸나!** 🎩")
+""", unsafe_allow_html=True)
 
 
 # 구글 스프레드시트 연결
