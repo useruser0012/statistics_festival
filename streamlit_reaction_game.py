@@ -98,8 +98,8 @@ elif st.session_state.page == 'survey':
     q4 = st.text_area("비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
 
     if st.button("설문 제출"):
-    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    data = [now_str, st.session_state.user_name, st.session_state.class_num,
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data = [now_str, st.session_state.user_name, st.session_state.class_num,
             st.session_state.tries, st.session_state.successes,
             st.session_state.failures, st.session_state.coins,
             q1, q2, q3, q4]
