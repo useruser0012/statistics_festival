@@ -56,31 +56,16 @@ if 'class_num' not in st.session_state:
 if 'tries' not in st.session_state:
     reset_game()
 
-# 버튼 스타일 (고정 크기)
-button_style = """
-    <style>
-    div.stButton > button {
-        width: 150px;
-        height: 50px;
-        font-size: 18px;
-        font-weight: bold;
-    }
-    </style>
-"""
-st.markdown(button_style, unsafe_allow_html=True)
-
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
     st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num - 1)
-    start_clicked = st.button("게임 시작")
-    if start_clicked:
+    if st.button("게임 시작"):
         if not st.session_state.user_name.strip():
             st.warning("이름을 입력해 주세요.")
         else:
             reset_game()
             st.session_state.page = 'game'
-            st.experimental_rerun()
 
 elif st.session_state.page == 'game':
     st.title("도파민 타이밍 게임")
@@ -122,24 +107,40 @@ elif st.session_state.page == 'game':
 
     phase = st.session_state.phase
 
+    button_style = """
+        <style>
+        div.stButton > button {
+            width: 150px;
+            height: 50px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        </style>
+    """
+    st.markdown(button_style, unsafe_allow_html=True)
+
     if phase == "start":
         st.write("버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!")
-        start_phase_clicked = st.button("게임 시작")
-        if start_phase_clicked:
+        if st.button("게임 시작"):
             st.session_state.phase = "wait"
-            st.experimental_rerun()
+            st.session_state.wait_start_time = time.time()
 
     elif phase == "wait":
         st.write("준비하세요... 곧 시작됩니다!")
-        time.sleep(random.uniform(1.5, 3.0))
-        st.session_state.start_time = time.time()
-        st.session_state.phase = "react"
-        st.experimental_rerun()
+        elapsed = time.time() - st.session_state.wait_start_time
+        wait_duration = random.uniform(1.5, 3.0)
+        remaining = wait_duration - elapsed
+        if remaining <= 0:
+            st.session_state.start_time = time.time()
+            st.session_state.phase = "react"
+            del st.session_state['wait_start_time']
+            st.experimental_rerun()
+        else:
+            st.write(f"{remaining:.1f}초 후 시작합니다...")
 
     elif phase == "react":
         st.success("🟢 지금 클릭하세요!")
-        click_react = st.button("클릭!")
-        if click_react:
+        if st.button("클릭!"):
             raw_time = time.time() - st.session_state.start_time
             reaction_time = raw_time * time_factor
             st.session_state.reaction_time = round(reaction_time, 3)
@@ -155,26 +156,21 @@ elif st.session_state.page == 'game':
                 gain = random.randint(30, 100)
                 st.session_state.coins += gain
                 st.session_state.result_message = f"✅ 반응시간 {reaction_time:.3f}초, 코인 {gain}개 획득!"
-
             st.session_state.phase = "result"
             st.experimental_rerun()
 
     elif phase == "result":
         st.subheader(f"⏱ 반응 속도: {st.session_state.reaction_time}초")
-        retry_clicked = st.button("다시 도전")
-        if retry_clicked:
+        if st.button("다시 도전"):
             st.session_state.phase = "start"
             st.session_state.result_message = ""
-            st.experimental_rerun()
 
     if st.session_state.tries >= 1000:
         st.write("📊 최대 시도에 도달했습니다. 설문조사로 이동합니다.")
         st.session_state.page = 'survey'
 
-    survey_click = st.button("게임 종료 후 설문조사")
-    if survey_click:
+    if st.button("게임 종료 후 설문조사"):
         st.session_state.page = 'survey'
-        st.experimental_rerun()
 
 elif st.session_state.page == 'survey':
     st.title("설문조사")
@@ -185,8 +181,7 @@ elif st.session_state.page == 'survey':
     q3 = st.radio("게임 중 충동을 느꼈나요?", options=["매우 충동적임", "충동적임", "보통", "충동적이지 않음"])
     q4 = st.text_area("비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
 
-    submit_clicked = st.button("설문 제출")
-    if submit_clicked:
+    if st.button("설문 제출"):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data = [now_str, st.session_state.user_name, st.session_state.class_num,
                 st.session_state.tries, st.session_state.successes,
@@ -203,4 +198,3 @@ elif st.session_state.page == 'survey':
         st.session_state.user_name = ""
         st.session_state.class_num = 1
         reset_game()
-        st.experimental_rerun()
