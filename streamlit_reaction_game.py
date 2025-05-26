@@ -46,14 +46,22 @@ def reset_game():
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
 
-if 'page' not in st.session_state:
-    st.session_state.page = 'start'
-if 'user_name' not in st.session_state:
-    st.session_state.user_name = ""
-if 'class_num' not in st.session_state:
-    st.session_state.class_num = 1
-if 'tries' not in st.session_state:
-    reset_game()
+# 세션 상태 초기화 (없는 키만 초기화)
+for key, default_value in {
+    "page": "start",
+    "user_name": "",
+    "class_num": 1,
+    "tries": 0,
+    "successes": 0,
+    "failures": 0,
+    "coins": 10,
+    "state": "ready",
+    "next_click_time": 0,
+    "reaction_start_time": 0,
+    "result_message": "",
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default_value
 
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
@@ -66,7 +74,7 @@ if st.session_state.page == 'start':
             reset_game()
             st.session_state.page = 'game'
             st.experimental_rerun()
-            st.stop()  # 여기서 반드시 stop() 추가
+            st.stop()
 
 elif st.session_state.page == 'game':
     st.title("도파민 타이밍 게임 진행 중")
@@ -90,7 +98,7 @@ elif st.session_state.page == 'game':
             st.session_state.result_message = ""
             st.session_state.tries += 1
             st.experimental_rerun()
-            st.stop()  # 여기서도 꼭 stop()
+            st.stop()
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
@@ -153,19 +161,14 @@ elif st.session_state.page == 'survey':
     if st.button("설문 제출"):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data = [now_str, st.session_state.user_name, st.session_state.class_num,
-                st.session_state.tries, st.session_state.successes,
-                st.session_state.failures, st.session_state.coins,
+                st.session_state.tries, st.session_state.successes, st.session_state.failures, st.session_state.coins,
                 q1, q2, q3, q4]
-
         try:
             sheet.append_row(data)
-            st.success("설문이 제출되었습니다! 감사합니다.")
+            st.success("설문이 제출되었습니다. 감사합니다!")
+            st.session_state.page = 'start'
+            st.experimental_rerun()
+            st.stop()
         except Exception as e:
-            st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
+            st.error(f"제출 중 오류가 발생했습니다: {e}")
 
-        st.session_state.page = "start"
-        st.session_state.user_name = ""
-        st.session_state.class_num = 1
-        reset_game()
-        st.experimental_rerun()
-        st.stop()
