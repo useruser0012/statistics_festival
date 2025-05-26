@@ -44,23 +44,23 @@ def play_round(class_num):
     st.session_state.tries += 1
     return message
 
-# 🧠 세션 상태 초기화
+# 세션 상태 초기화 (항상 가장 먼저 실행)
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'coins' not in st.session_state:
-    reset_game()
-if 'user_name' not in st.session_state:
-    st.session_state.user_name = ''
-if 'class_num' not in st.session_state:
-    st.session_state.class_num = 1
+    st.session_state.coins = 10
 if 'successes' not in st.session_state:
     st.session_state.successes = 0
 if 'failures' not in st.session_state:
     st.session_state.failures = 0
 if 'tries' not in st.session_state:
     st.session_state.tries = 0
+if 'user_name' not in st.session_state:
+    st.session_state.user_name = ''
+if 'class_num' not in st.session_state:
+    st.session_state.class_num = 1
 
-# 🟢 시작 페이지
+# 게임 시작 페이지
 if st.session_state.page == 'start':
     st.title("게임 시작 페이지")
     user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
@@ -68,7 +68,6 @@ if st.session_state.page == 'start':
     if st.button("게임 시작") and user_name.strip() != "":
         st.session_state.user_name = user_name
         st.session_state.class_num = class_num
-        reset_game()
         st.session_state.page = 'game'
         st.experimental_rerun()
 
