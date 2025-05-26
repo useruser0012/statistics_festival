@@ -102,18 +102,19 @@ elif st.session_state.page == 'game':
                 coin_loss = calculate_failure_coin_loss(st.session_state.tries)
                 st.session_state.coins -= coin_loss
                 st.session_state.result_message = f"너무 빠른 클릭으로 실패! 코인 {coin_loss}개 손실."
-            elif reaction_time > 1.5:
-                st.warning("너무 늦게 클릭하셨습니다! 실패 처리됩니다.")
-                st.session_state.failures += 1
-                coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                st.session_state.coins -= coin_loss
-                st.session_state.result_message = f"너무 늦은 클릭으로 실패! 코인 {coin_loss}개 손실."
-            else:
-                st.success("성공했습니다!")
-                st.session_state.successes += 1
-                coin_gain = random.randint(30, 100)
-                st.session_state.coins += coin_gain
-                st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
+           if reaction_time > 5.0:
+    st.warning("너무 늦게 클릭하셨습니다! 실패 처리됩니다.")
+    st.session_state.failures += 1
+    coin_loss = calculate_failure_coin_loss(st.session_state.tries)
+    st.session_state.coins -= coin_loss
+    st.session_state.result_message = f"너무 늦은 클릭으로 실패! 코인 {coin_loss}개 손실."
+else:
+    st.success("성공했습니다!")
+    st.session_state.successes += 1
+    coin_gain = random.randint(30, 100)
+    st.session_state.coins += coin_gain
+    st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
+
 
             st.session_state.state = 'ready'
 
