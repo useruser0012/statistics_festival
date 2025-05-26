@@ -2,6 +2,7 @@ import streamlit as st
 import time
 import random
 import datetime
+
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -47,15 +48,13 @@ def reset_game():
     st.session_state.reaction_time = None
     st.session_state.result = ""
 
-# 세션 상태 초기화
+# 세션 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'user_name' not in st.session_state:
     st.session_state.user_name = ""
 if 'class_num' not in st.session_state:
     st.session_state.class_num = 1
-if 'phase' not in st.session_state:
-    st.session_state.phase = "start"
 if 'tries' not in st.session_state:
     reset_game()
 
@@ -70,7 +69,6 @@ if st.session_state.page == 'start':
         else:
             reset_game()
             st.session_state.page = 'game'
-            st.experimental_rerun()
 
 # 게임 페이지
 elif st.session_state.page == 'game':
@@ -78,12 +76,14 @@ elif st.session_state.page == 'game':
     user_name = st.session_state.user_name
     class_num = st.session_state.class_num
     time_factor = class_settings[class_num]["time_factor"]
-    phase = st.session_state.phase
 
     st.write(f"👤 {user_name}님 | 🏫 {class_num}반")
     st.write(f"🔁 시도: {st.session_state.tries} | ✅ 성공: {st.session_state.successes} | ❌ 실패: {st.session_state.failures} | 🪙 코인: {st.session_state.coins}")
 
+    # 고정 높이 텍스트 박스
     message = ""
+    phase = st.session_state.phase
+
     if phase == "start":
         message = "버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!"
     elif phase == "wait":
@@ -102,22 +102,17 @@ elif st.session_state.page == 'game':
         unsafe_allow_html=True
     )
 
+    # 게임 단계별 버튼 처리
     if phase == "start":
         if st.button("게임 시작"):
-            # 대기 시간 설정 후 phase 전환
-            st.session_state.wait_start_time = time.time() + random.uniform(1.5, 3.0)
             st.session_state.phase = "wait"
-            st.experimental_rerun()
+            st.rerun()
 
     elif phase == "wait":
-        # 타이머 대기
-        if time.time() < st.session_state.wait_start_time:
-            st.write("잠시만 기다려 주세요...")
-            st.stop()  # 타이머 완료 전까지 화면 멈춤
-        else:
-            st.session_state.start_time = time.time()
-            st.session_state.phase = "react"
-            st.experimental_rerun()
+        time.sleep(random.uniform(1.5, 3.0))
+        st.session_state.start_time = time.time()
+        st.session_state.phase = "react"
+        st.rerun()
 
     elif phase == "react":
         if st.button("클릭!"):
@@ -136,25 +131,22 @@ elif st.session_state.page == 'game':
                 gain = random.randint(30, 100)
                 st.session_state.coins += gain
                 st.session_state.result = f"✅ 반응시간 {reaction_time:.3f}초, 코인 {gain}개 획득!"
-
             st.session_state.phase = "result"
-            st.experimental_rerun()
+            st.rerun()
 
     elif phase == "result":
         st.markdown(f"### {st.session_state.result}")
         if st.button("다시 도전"):
             st.session_state.phase = "start"
-            st.experimental_rerun()
+            st.session_state.result_message = st.session_state.result
+            st.rerun()
 
-    # 최대 시도 도달 시 설문 페이지로 이동
     if st.session_state.tries >= 1000:
         st.write("📊 최대 시도에 도달했습니다. 설문조사로 이동합니다.")
         st.session_state.page = 'survey'
-        st.experimental_rerun()
 
     if st.button("게임 종료 후 설문조사"):
         st.session_state.page = 'survey'
-        st.experimental_rerun()
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
@@ -179,9 +171,7 @@ elif st.session_state.page == 'survey':
         except Exception as e:
             st.error(f"설문 제출 중 오류 발생: {e}")
 
-        # 초기화 후 시작 페이지로
         st.session_state.page = "start"
         st.session_state.user_name = ""
         st.session_state.class_num = 1
         reset_game()
-        st.experimental_rerun()
