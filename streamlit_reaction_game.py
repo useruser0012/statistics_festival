@@ -19,7 +19,24 @@ def reset_game():
 
 # 성공 확률 함수
 def get_success_probability(class_num):
-    if class_num in [1, 3, 5,전 코인: {st.session_state.coins}")
+    if class_num in [1, 3, 5, 7, 9]:
+        return 0.5
+    elif class_num in [2, 6, 10]:
+        return 0.2
+    elif class_num in [4, 8]:
+        return 0.9
+    else:
+        return 0.5
+
+# 게임 진행 함수
+def play_round(class_num):
+    prob = get_success_probability(class_num)
+    success_flag = random.random() < prob
+    coin_change = random.randint(30, 120)
+    if success_flag:
+        st.session_state.coins += coin_change
+        st.session_state.successes += 1
+        message = f"✅ 성공! 코인이 +{coin_c전 코인: {st.session_state.coins}")
     st.write(f"도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
     if st.button("카드 선택 (1/2 확률 게임)"):
@@ -91,4 +108,4 @@ elif st.session_state.page == 'survey2':
 # 5. 설문 완료 페이지
 elif st.session_state.page == 'thanks':
     st.title("🎉 설문 완료")
-    st.success("설문에 참여해 주셔서 감사합니다! 🙏")
+    st.success("설문에 참여해 주셔서 감사합니다! 🙏") 
