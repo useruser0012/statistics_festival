@@ -98,21 +98,21 @@ elif st.session_state.page == 'survey':
     q4 = st.text_area("비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
 
     if st.button("설문 제출"):
-        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data = [now_str, st.session_state.user_name, st.session_state.class_num,
-                st.session_state.tries, st.session_state.successes,
-                st.session_state.failures, st.session_state.coins,
-                q1, q2, q3, q4]
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    data = [now_str, st.session_state.user_name, st.session_state.class_num,
+            st.session_state.tries, st.session_state.successes,
+            st.session_state.failures, st.session_state.coins,
+            q1, q2, q3, q4]
 
-        try:
-            SHEET.append_row(data)
-            st.success("설문이 제출되었습니다! 감사합니다.")
-        except Exception as e:
-            st.error(f"설문 제출 중 오류 발생: {e}")
+    try:
+        sheet.append_row(data)  # 수정된 부분
+        st.success("설문이 제출되었습니다! 감사합니다.")
+    except Exception as e:
+        st.error(f"설문 제출 중 오류 발생: {e}")
 
-        # 게임 초기화 후 시작 페이지로 돌아감
-        st.session_state.page = "start"
-        st.session_state.user_name = ""
-        st.session_state.class_num = 1
-        reset_game()
-        st.experimental_rerun()
+    # 게임 초기화 후 시작 페이지로 돌아감
+    st.session_state.page = "start"
+    st.session_state.user_name = ""
+    st.session_state.class_num = 1
+    reset_game()
+    st.experimental_rerun()
