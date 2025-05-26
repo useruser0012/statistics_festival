@@ -149,4 +149,4 @@ elif st.session_state.page == 'survey2':
 # 5. 설문 완료 페이지
 elif st.session_state.page == 'thanks':
     st.title("🎉 설문 완료")
-    st.success("설문에 참여해 주셔서 감사합니다! 🙏")  이
+    st.success("설문에 참여해 주셔서 감사합니다! 🙏")
