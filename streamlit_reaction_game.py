@@ -31,7 +31,6 @@ def play_round(class_num):
     prob = get_success_probability(class_num)
     success_flag = random.random() < prob
     coin_change = random.randint(30, 120)
-    
     if success_flag:
         st.session_state.coins += coin_change
         st.session_state.successes += 1
@@ -40,11 +39,10 @@ def play_round(class_num):
         st.session_state.coins -= coin_change
         st.session_state.failures += 1
         message = f"실패... 코인이 -{coin_change} 만큼 감소했습니다."
-    
     st.session_state.tries += 1
     return message
 
-# --- 세션 상태 초기 설정 ---
+# --- 세션 상태 초기화 ---
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 if 'coins' not in st.session_state:
@@ -60,7 +58,7 @@ if 'failures' not in st.session_state:
 if 'tries' not in st.session_state:
     st.session_state.tries = 0
 
-# --- 페이지별 화면 처리 ---
+# --- 페이지별 UI 및 로직 ---
 if st.session_state.page == 'start':
     st.title("게임 시작 페이지")
     st.session_state.user_name = st.text_input("이름을 입력하세요")
@@ -81,7 +79,7 @@ elif st.session_state.page == 'game':
         st.write(result_message)
         st.write(f"현재 코인: {st.session_state.coins}")
 
-    if st.button("그만하기"):
+    if st.button("그만하기 (게임 종료 및 설문조사)"):
         st.session_state.page = 'survey'
         st.experimental_rerun()
 
@@ -96,19 +94,27 @@ elif st.session_state.page == 'survey':
 
     if st.button("설문 제출"):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data = [now_str, st.session_state.user_name, st.session_state.class_num,
-                st.session_state.tries, st.session_state.successes,
-                st.session_state.failures, st.session_state.coins,
-                q1, q2, q3, q4]
+        data = [
+            now_str,
+            st.session_state.user_name,
+            st.session_state.class_num,
+            st.session_state.tries,
+            st.session_state.successes,
+            st.session_state.failures,
+            st.session_state.coins,
+            q1,
+            q2,
+            q3,
+            q4
+        ]
         try:
             sheet.append_row(data)
             st.success("설문이 제출되었습니다! 감사합니다.")
+            # 초기화 및 페이지 전환
+            reset_game()
+            st.session_state.user_name = ''
+            st.session_state.class_num = 1
+            st.session_state.page = 'start'
+            st.experimental_rerun()
         except Exception as e:
             st.error(f"설문 제출 중 오류 발생: {e}")
-
-        # 게임 초기화 및 시작 페이지로 이동
-        reset_game()
-        st.session_state.user_name = ''
-        st.session_state.class_num = 1
-        st.session_state.page = 'start'
-        st.experimental_rerun()
