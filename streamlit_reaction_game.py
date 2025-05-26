@@ -100,6 +100,10 @@ elif st.session_state.page == 'game':
         if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
             st.session_state.reaction_start_time = time.time()
+            st.experimental_rerun()
+        else:
+            # 짧은 시간 후 자동 새로고침으로 상태 체크 지속
+            st.experimental_rerun()
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
