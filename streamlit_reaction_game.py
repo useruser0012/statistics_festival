@@ -26,7 +26,7 @@ class_settings = {
     10: {"time_factor": 0.8},
 }
 
-# 실패 시 코인 손실 계산
+# 실패 시 코인 손실 계산 함수
 def calculate_failure_coin_loss(tries):
     min_loss = 30
     max_loss = 120
@@ -48,6 +48,7 @@ def reset_game():
     st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
 
+# 초기 세션 상태 설정
 if 'page' not in st.session_state:
     st.session_state.page = 'start'
 
@@ -64,13 +65,14 @@ if 'tries' not in st.session_state:
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
-    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num - 1)
+    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num-1)
     if st.button("게임 시작"):
         if not st.session_state.user_name.strip():
             st.warning("이름을 입력해 주세요.")
         else:
             reset_game()
             st.session_state.page = 'game'
+            st.experimental_rerun()  # 페이지 전환 즉시 반영
 
 # 게임 페이지
 elif st.session_state.page == 'game':
@@ -94,14 +96,15 @@ elif st.session_state.page == 'game':
             st.session_state.state = 'waiting'
             st.session_state.result_message = ""
             st.session_state.tries += 1
+            st.experimental_rerun()  # 상태변경 후 즉시 rerun
 
     elif st.session_state.state == 'waiting':
         st.write("준비 중... 잠시만 기다려주세요.")
         if now >= st.session_state.next_click_time:
             st.session_state.state = 'click_now'
             st.session_state.reaction_start_time = time.time()
-        else:
-            st.rerun()  # ⬅️ 수정된 부분
+            st.experimental_rerun()  # 상태 변경 후 즉시 rerun
+        # 조건이 안 되면 그냥 대기 상태 유지, rerun 호출 안 함!
 
     elif st.session_state.state == 'click_now':
         if st.button("클릭!"):
@@ -131,17 +134,19 @@ elif st.session_state.page == 'game':
                 st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
 
             st.session_state.state = 'ready'
+            st.experimental_rerun()  # 결과 보여주고 바로 상태변경 후 rerun
 
     # 최대 시도 제한
     if st.session_state.tries >= 1000:
         st.write("최대 시도 횟수에 도달했습니다. 설문조사 페이지로 이동합니다.")
         st.session_state.page = 'survey'
+        st.experimental_rerun()
 
     # 게임 중 설문조사 버튼
     if st.session_state.page == 'game':
         if st.button("게임 종료 후 설문조사"):
             st.session_state.page = 'survey'
-            st.rerun()  # ⬅️ 수정된 부분
+            st.experimental_rerun()
 
 # 설문조사 페이지
 elif st.session_state.page == 'survey':
@@ -166,8 +171,9 @@ elif st.session_state.page == 'survey':
         except Exception as e:
             st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
 
-        # 초기화
+        # 초기화 및 시작 페이지로 이동
         st.session_state.page = "start"
         st.session_state.user_name = ""
         st.session_state.class_num = 1
         reset_game()
+        st.experimental_rerun()
