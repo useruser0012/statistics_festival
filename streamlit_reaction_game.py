@@ -12,7 +12,7 @@ creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"],
 client = gspread.authorize(creds)
 sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
-# 반별 시간 조작 비율 (반응시간에 곱함)
+# 반별 시간 조작 비율
 class_settings = {
     1: {"time_factor": 1.0},
     2: {"time_factor": 0.8},
@@ -26,7 +26,7 @@ class_settings = {
     10: {"time_factor": 0.8},
 }
 
-# 실패 시 코인 손실 계산
+# 실패 시 코인 손실 계산 함수
 def calculate_failure_coin_loss(tries):
     min_loss = 30
     max_loss = 120
@@ -38,14 +38,17 @@ def calculate_failure_coin_loss(tries):
         loss_max = 50 + (max_loss - 50) * (tries / max_tries_for_max_loss)
         return random.randint(int(loss_min), int(loss_max))
 
+# 초기화 함수
 def reset_game():
     st.session_state.tries = 0
     st.session_state.successes = 0
     st.session_state.failures = 0
     st.session_state.coins = 10
-    st.session_state.state = 'ready'
-    st.session_state.reaction_start_time = 0
     st.session_state.result_message = ""
+    st.session_state.phase = "start"
+    st.session_state.start_time = None
+    st.session_state.reaction_time = None
+    st.session_state.result = ""
 
 # 세션 초기화
 if 'page' not in st.session_state:
@@ -61,7 +64,7 @@ if 'tries' not in st.session_state:
 if st.session_state.page == 'start':
     st.title("도파민 타이밍 게임")
     st.session_state.user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
-    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num-1)
+    st.session_state.class_num = st.selectbox("반을 선택하세요", list(range(1, 11)), index=st.session_state.class_num - 1)
     if st.button("게임 시작"):
         if not st.session_state.user_name.strip():
             st.warning("이름을 입력해 주세요.")
@@ -71,48 +74,64 @@ if st.session_state.page == 'start':
 
 # 게임 페이지
 elif st.session_state.page == 'game':
-    st.title("도파민 타이밍 게임 진행 중")
+    st.title("도파민 타이밍 게임")
     user_name = st.session_state.user_name
     class_num = st.session_state.class_num
     time_factor = class_settings[class_num]["time_factor"]
 
-    st.write(f"{user_name}님, {class_num}반 게임 중입니다.")
-    st.write(f"총 시도: {st.session_state.tries} | 성공: {st.session_state.successes} | 실패: {st.session_state.failures} | 코인: {st.session_state.coins}")
+    st.write(f"👤 {user_name}님 | 🏫 {class_num}반")
+    st.write(f"🔁 시도: {st.session_state.tries} | ✅ 성공: {st.session_state.successes} | ❌ 실패: {st.session_state.failures} | 🪙 코인: {st.session_state.coins}")
 
     if st.session_state.result_message:
         st.markdown(st.session_state.result_message)
 
-    if st.session_state.state == 'ready':
-        if st.button("반응 시작"):
-            st.session_state.state = 'click_now'
-            st.session_state.reaction_start_time = time.time()
-            st.session_state.result_message = ""
+    # 게임 단계
+    phase = st.session_state.phase
+
+    if phase == "start":
+        st.write("버튼이 초록색으로 바뀌면 최대한 빨리 클릭하세요!")
+        if st.button("게임 시작"):
+            st.session_state.phase = "wait"
+            st.rerun()
+
+    elif phase == "wait":
+        st.write("준비하세요... 곧 시작됩니다!")
+        time.sleep(random.uniform(1.5, 3.0))
+        st.session_state.start_time = time.time()
+        st.session_state.phase = "react"
+        st.rerun()
+
+    elif phase == "react":
+        st.success("🟢 지금 클릭하세요!")
+        if st.button("클릭!"):
+            raw_time = time.time() - st.session_state.start_time
+            reaction_time = raw_time * time_factor
+            st.session_state.reaction_time = round(reaction_time, 3)
             st.session_state.tries += 1
 
-    elif st.session_state.state == 'click_now':
-        if st.button("클릭!"):
-            raw_reaction_time = time.time() - st.session_state.reaction_start_time
-            reaction_time = raw_reaction_time * time_factor
-
-            st.write(f"반응시간: {reaction_time:.3f}초")
-
             if reaction_time > 5.0:
-                st.warning("너무 늦게 클릭하셨습니다! 실패 처리됩니다.")
                 st.session_state.failures += 1
-                coin_loss = calculate_failure_coin_loss(st.session_state.tries)
-                st.session_state.coins -= coin_loss
-                st.session_state.result_message = f"5초 초과로 실패! 코인 {coin_loss}개 손실."
+                loss = calculate_failure_coin_loss(st.session_state.tries)
+                st.session_state.coins -= loss
+                st.session_state.result = f"❌ 5초 초과로 실패! 코인 {loss}개 손실."
             else:
-                st.success("성공했습니다!")
                 st.session_state.successes += 1
-                coin_gain = random.randint(30, 100)
-                st.session_state.coins += coin_gain
-                st.session_state.result_message = f"반응시간 {reaction_time:.3f}초, 코인 {coin_gain}개 획득!"
+                gain = random.randint(30, 100)
+                st.session_state.coins += gain
+                st.session_state.result = f"✅ 반응시간 {reaction_time:.3f}초, 코인 {gain}개 획득!"
+            st.session_state.phase = "result"
+            st.rerun()
 
-            st.session_state.state = 'ready'
+    elif phase == "result":
+        st.subheader(f"⏱ 반응 속도: {st.session_state.reaction_time}초")
+        st.markdown(f"### {st.session_state.result}")
+        if st.button("다시 도전"):
+            st.session_state.phase = "start"
+            st.session_state.result_message = st.session_state.result
+            st.rerun()
 
     if st.session_state.tries >= 1000:
-        st.write("최대 시도 횟수에 도달했습니다. 설문조사 페이지로 이동합니다.")
+        st.write("📊 최대 시도에 도달했습니다. 설문조사로 이동합니다.")
         st.session_state.page = 'survey'
 
     if st.button("게임 종료 후 설문조사"):
@@ -139,9 +158,8 @@ elif st.session_state.page == 'survey':
             sheet.append_row(data)
             st.success("설문이 제출되었습니다! 감사합니다.")
         except Exception as e:
-            st.error(f"설문 제출 중 오류가 발생했습니다: {e}")
+            st.error(f"설문 제출 중 오류 발생: {e}")
 
-        # 초기화
         st.session_state.page = "start"
         st.session_state.user_name = ""
         st.session_state.class_num = 1
