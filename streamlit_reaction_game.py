@@ -38,7 +38,7 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-      # 🃏 폰트 적용 + 반응형 CSS 추가
+    # 🃏 폰트 적용 + 반응형 CSS 추가
     st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <style>
@@ -46,7 +46,6 @@ def main():
         font-family: 'Bangers', cursive;
     }
 
-    /* 본문 스타일 */
     .responsive-text {
         font-size: 24px;
         color: #ffffff;
@@ -54,7 +53,6 @@ def main():
         line-height: 1.4;
     }
 
-    /* 모바일 화면에서 폰트 크기 줄이기 */
     @media (max-width: 600px) {
         .responsive-text {
             font-size: 16px;
@@ -63,24 +61,23 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-# 🎮 타이틀 (원하는 크기로 직접 스타일링 가능)
-st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
+    # 🎮 타이틀
+    st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
 
-# 반응형 텍스트
-st.markdown("""
-<p class="responsive-text">
-🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
-카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
-맞출 수 있을까? 아니면 조커에게 놀아날까?
-</p>
-""", unsafe_allow_html=True)
+    # 반응형 텍스트
+    st.markdown("""
+    <p class="responsive-text">
+    🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
+    카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
+    맞출 수 있을까? 아니면 조커에게 놀아날까?
+    </p>
+    """, unsafe_allow_html=True)
 
-
-# 🔗 Google Sheets 연결
-scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scope)
-client = gspread.authorize(creds)
-sheet = client.open("도파민 타이밍 게임 기록").sheet1
+    # 🔗 Google Sheets 연결
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scope)
+    client = gspread.authorize(creds)
+    sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
     # 🌟 게임 상태 초기화 함수
     def reset_game():
@@ -115,7 +112,7 @@ sheet = client.open("도파민 타이밍 게임 기록").sheet1
             st.session_state.failures += 1
             return f"❌ 낄낄낄 실패! 코인이 -{coin_change} 만큼 감소했다."
 
-    # 세션 초기화
+    # 세션 상태 초기화
     if 'page' not in st.session_state:
         st.session_state.page = 'start'
     if 'coins' not in st.session_state:
@@ -137,20 +134,17 @@ sheet = client.open("도파민 타이밍 게임 기록").sheet1
             reset_game()
             st.session_state.page = 'game'
             st.experimental_rerun()
-            return  # 함수 내부라 가능
+            return
 
     # 2️⃣ 게임 페이지
     elif st.session_state.page == 'game':
         st.subheader(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
-        
-        #st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
         if st.button("🃏 카드 선택 (1/2 확률 게임)"):
             result_message = play_round(st.session_state.class_num)
             st.write(result_message)
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
-
 
         if st.button("그만하기 (게임 종료 및 설문조사)"):
             st.session_state.page = 'survey'
@@ -229,4 +223,4 @@ sheet = client.open("도파민 타이밍 게임 기록").sheet1
             return
 
 if __name__ == "__main__":
-    main() 
+    main()
