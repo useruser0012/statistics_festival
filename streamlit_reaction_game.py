@@ -149,51 +149,59 @@ def main():
 
              # 오버레이 출력
         if st.session_state.show_overlay:
-            overlay_html = """
+              overlay_html = """
             <style>
             #overlay {
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: rgba(0,0,0,0.7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-            }
-            #card {
-                width: 300px;
-                height: 400px;
-                background: white;
-                border-radius: 20px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: 6rem;
-                box-shadow: 0 0 20px 5px gold;
-                user-select: none;
-            }
-           
-            </style>
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #card {
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 6rem;
+            box-shadow: 0 0 20px 5px gold;
+            user-select: none;    
+        }
+        #close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: black;
+            user-select: none;
+        }
+        </style>
 
-            <div id="overlay" onclick="document.getElementById('overlay').style.display='none';">
-                <div id="close-btn" onclick="document.getElementById('overlay').style.display='none'; event.stopPropagation();">✖</div>
-                <div id="card">🃏</div>
-                <audio id="sound" autoplay>
-                  <source src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" type="audio/mpeg">
-                </audio>
-            </div>
+        <div id="overlay" onclick="this.style.display='none'">
+            <div id="close-btn" onclick="event.stopPropagation(); this.parentElement.style.display='none';">✖</div>
+            <div id="card">🃏</div>
+            <audio id="sound" autoplay>
+              <source src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" type="audio/mpeg">
+            </audio>
+        </div>
 
-            <script>
-            const audio = document.getElementById('sound');
-            audio.play().catch(e => console.log("Autoplay prevented:", e));
-             // 2초 뒤에 오버레이 숨기기 (UI만)
-            setTimeout(() => {
-                const overlay = document.getElementById('overlay');
-                if(overlay) overlay.style.display = 'none';
-            }, 1000);
-            </script>
-            """
-            st.markdown(overlay_html, unsafe_allow_html=True)
+        <script>
+        const audio = document.getElementById('sound');
+        audio.play().catch(e => console.log("Autoplay prevented:", e));
+
+        setTimeout(() => {
+            document.getElementById('overlay').style.display = 'none';
+        }, 1000);
+        </script>
+        """
+
+    st.markdown(overlay_html, unsafe_allow_html=True)
             # 1초 기다렸다가 오버레이 상태 끄기 (재렌더링 위해)
             time.sleep(1)
             st.session_state.show_overlay = False
