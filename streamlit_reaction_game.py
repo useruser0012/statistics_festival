@@ -190,7 +190,7 @@ def main():
             setTimeout(() => {
                 const overlay = document.getElementById('overlay');
                 if(overlay) overlay.style.display = 'none';
-            }, 2000);
+            }, 1000);
             </script>
             """
             st.markdown(overlay_html, unsafe_allow_html=True)
