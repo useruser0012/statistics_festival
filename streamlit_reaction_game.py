@@ -188,7 +188,7 @@ elif st.session_state.page == 'survey2':
     q8 = st.radio("4. 이번 게임의 코인이 실제 돈이었다면, 이 게임을 계속했을 것 같나요?", 
                   ["계속했을 것이다", "고민했을 것이다", "하지 않았을 것이다"])
 
-        if st.button("설문 최종 제출"):
+    if st.button("설문 최종 제출"):
         st.session_state.q5 = q5
         st.session_state.q6 = q6
         st.session_state.q7 = q7
@@ -212,17 +212,13 @@ elif st.session_state.page == 'survey2':
             st.session_state.q7,
             st.session_state.q8
         ]
-
         try:
-            if sheet:
-                sheet.append_row(data)
-                st.success("✅ 설문이 성공적으로 제출되었습니다.")
-                st.session_state.page = 'thanks'
-                st.experimental_rerun()
-            else:
-                st.error("❌ 스프레드시트 접근 실패: sheet 객체가 없습니다.")
+            sheet.append_row(data)
+            st.session_state.page = 'thanks'
+            st.experimental_rerun()
         except Exception as e:
-            st.error(f"❌ 설문 제출 중 오류 발생: {str(e)}")
+            st.error(f"❌ 설문 제출 중 오류 발생: {e}")
+
 
 
 # 5. 설문 완료 페이지
