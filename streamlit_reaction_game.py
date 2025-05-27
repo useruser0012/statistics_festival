@@ -80,21 +80,21 @@ def main():
         st.error(f"Google Sheets 연결 실패: {e}")
         return
 
-        # 여기 바로 아래에 카드 빛나는 이미지 리스트를 선언해 주세요.
+    # 카드 이미지 리스트 (쉼표 수정 포함)
     card_shine_images = [
         "https://w7.pngwing.com/pngs/552/466/png-transparent-jokerz-computer-icons-playing-card-clown-joker-heroes-fictional-character-joker.png",
         "https://w7.pngwing.com/pngs/658/87/png-transparent-black-and-gray-ace-card-united-states-playing-card-company-card-game-bicycle-plum-metal-plate-game-king-plate.png",
         "https://w7.pngwing.com/pngs/279/765/png-transparent-ace-of-spade-playing-card-ace-of-spades-standard-52-card-deck-card-game-ace-card-game-emblem-king.png",
         "https://w7.pngwing.com/pngs/902/280/png-transparent-ace-of-spades-playing-card-ace-of-hearts-spades-game-angle-king.png",
-        "https://w7.pngwing.com/pngs/154/969/png-transparent-ace-of-clubs-playing-card-ace-of-spades-playing-card-espadas-ace-card-game-heroes-monochrome.png", # 예시 이미지 URL (투명 배경 빛나는 카드)
+        "https://w7.pngwing.com/pngs/154/969/png-transparent-ace-of-clubs-playing-card-ace-of-spades-playing-card-espadas-ace-card-game-heroes-monochrome.png",
         "https://w7.pngwing.com/pngs/252/807/png-transparent-card-joker-harley-quinn.png",
         "https://w7.pngwing.com/pngs/733/974/png-transparent-joker-emoji-playing-card-unicode-game-card-game-heroes-text.png",
-        "https://w7.pngwing.com/pngs/286/715/png-transparent-poker-playing-card-ace-of-spades-jack-joker-white-heroes-text.png", 
+        "https://w7.pngwing.com/pngs/286/715/png-transparent-poker-playing-card-ace-of-spades-jack-joker-white-heroes-text.png",
         "https://w7.pngwing.com/pngs/344/854/png-transparent-playing-card-four-card-poker-joker-standard-52-card-deck-three-card-poker-spade-game-angle-heroes.png",
-        "https://w7.pngwing.com/pngs/741/485/png-transparent-playing-card-card-game-cult-film-poker-joker-game-heroes-logo.png"
+        "https://w7.pngwing.com/pngs/741/485/png-transparent-playing-card-card-game-cult-film-poker-joker-game-heroes-logo.png",
         "https://w7.pngwing.com/pngs/800/372/png-transparent-joker-playing-card-graphy-card-game-joker-king-heroes-photography.png",
         "https://w7.pngwing.com/pngs/531/586/png-transparent-joker-bicycle-playing-cards-united-states-playing-card-company-card-game-joker-king-heroes-text.png",
-        "https://w7.pngwing.com/pngs/244/185/png-transparent-playing-card-card-game-ace-of-spades-joker-joker.png", 
+        "https://w7.pngwing.com/pngs/244/185/png-transparent-playing-card-card-game-ace-of-spades-joker-joker.png",
         "https://w7.pngwing.com/pngs/296/229/png-transparent-joker-playing-card-batman-text-messaging-black-card-white-mammal-heroes.png"
     ]
 
@@ -119,49 +119,49 @@ def main():
         success = random.random() < prob
         st.session_state.tries += 1
 
-    # 7번째 시도일 때 강제 잭팟 (코인 증가만)
-    if st.session_state.tries == 7:
-        delta = 500
-        st.session_state.coins += delta
+        # 7번째 시도일 때 강제 잭팟 (코인 증가만)
+        if st.session_state.tries == 7:
+            delta = 500
+            st.session_state.coins += delta
+            if success:
+                st.session_state.successes += 1
+                return f"🎉 대박 성공! 코인이 +{delta} 증가했군! 운이 좋으시네~"
+            else:
+                st.session_state.failures += 1
+                return f"🎉 대박 보너스! 코인이 +{delta} 증가했다! 자네는 행운의 여신과 함께하나?"
+
+        jackpot_chance = 0.01
         if success:
-            st.session_state.successes += 1
-            return f"🎉 대박 성공! 코인이 +{delta} 증가했군! 운이 좋으시네~"
+            if random.random() < jackpot_chance:
+                delta = 500
+                st.session_state.coins += delta
+                st.session_state.successes += 1
+                return f"🎉 대박 성공! 코인이 +{delta} 증가했다!"
+            else:
+                delta = random.randint(30, 120)
+                st.session_state.coins += delta
+                st.session_state.successes += 1
+                return f"✅ 성공했군! 코인이 +{delta} 증가했다."
         else:
-            st.session_state.failures += 1
-            return f"🎉 대박 보너스! 코인이 +{delta} 증가했다! 자네는 행운의 여신과 함께하나?"
+            if random.random() < jackpot_chance:
+                delta = 500
+                st.session_state.failures += 1
+                st.session_state.coins += delta  # 실패해도 잭팟은 증가만
+                return f"😲 실패했지만 보너스! 코인이 +{delta} 증가했다!"
+            else:
+                delta = random.randint(50, 150)  # 감소 폭 증가
+                st.session_state.coins -= delta
+                st.session_state.failures += 1
+                return f"❌ 낄낄낄 실패! 코인이 -{delta} 감소했다."
 
-    jackpot_chance = 0.01
-    if success:
-        if random.random() < jackpot_chance:
-            delta = 500
-            st.session_state.coins += delta
-            st.session_state.successes += 1
-            return f"🎉 대박 성공! 코인이 +{delta} 증가했다!"
-        else:
-            delta = random.randint(30, 120)
-            st.session_state.coins += delta
-            st.session_state.successes += 1
-            return f"✅ 성공했군! 코인이 +{delta} 증가했다."
-    else:
-        if random.random() < jackpot_chance:
-            delta = 500
-            st.session_state.failures += 1
-            st.session_state.coins += delta  # 실패해도 잭팟은 증가만
-            return f"😲 실패했지만 보너스! 코인이 +{delta} 증가했다!"
-        else:
-            delta = random.randint(50, 150)  # 감소 폭 증가
-            st.session_state.coins -= delta
-            st.session_state.failures += 1
-            return f"❌ 낄낄낄 실패! 코인이 -{delta} 감소했다."
+# 세션 초기화
+if 'page' not in st.session_state:
+    st.session_state.page = 'start'
+    reset_game()
+    st.session_state.user_name = ''
+    st.session_state.class_num = 1
 
-    # 세션 초기화
-    if 'page' not in st.session_state:
-        st.session_state.page = 'start'
-        reset_game()
-        st.session_state.user_name = ''
-        st.session_state.class_num = 1
-
-    # 1️⃣ 시작 화면
+# 1️⃣ 시작 화면
     if st.session_state.page == 'start':
         st.header("🎮 게임 시작")
         user_name = st.text_input("이름 입력", value=st.session_state.user_name)
@@ -175,29 +175,20 @@ def main():
                 st.session_state.page = 'game'
                 st.experimental_rerun()
 
-    # 2️⃣ 게임 화면
-   elif st.session_state.page == 'game':
+# 2️⃣ 게임 화면
+ elif st.session_state.page == 'game':
     st.subheader(f"{st.session_state.user_name} 님의 게임")
 
     if st.button("🃏 카드 선택"):
-        # 1) 오버레이 띄울 자리 만들기
         placeholder = st.empty()
-        
-        # 2) 이미지 랜덤 선택
         shine_img = random.choice(card_shine_images)
-        
-        # 3) 이미지 표시 (오버레이)
         placeholder.image(shine_img, width=200)
-        
-        # 4) 2초 대기
-        import time
         time.sleep(2)
-        
-        # 5) 이미지 지우기 (오버레이 제거)
         placeholder.empty()
         
         # 6) 게임 결과 출력
-        st.write(play_round(st.session_state.class_num))
+        result_msg = play_round(st.session_state.class_num)
+        st.write(result_msg)
         st.write(f"💰 코인: {st.session_state.coins}")
         st.write(f"📊 시도: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
