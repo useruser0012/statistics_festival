@@ -168,61 +168,87 @@ def main():
         user_name = st.text_input("이름 입력", value=st.session_state.user_name)
         class_num = st.number_input("반 입력 (1~10)", min_value=1, max_value=10, value=st.session_state.class_num)
 
-        if st.button("게임 시작"):
-            if user_name.strip():
-                st.session_state.user_name = user_name.strip()
-                st.session_state.class_num = class_num
-                reset_game()
-                st.session_state.page = 'game'
-                st.experimental_rerun()
-
-    # 2️⃣ 게임 화면
-    elif st.session_state.page == 'game':
-        st.subheader(f"{st.session_state.user_name} 님의 게임")
-
-        if st.button("🃏 카드 선택"):
-            placeholder = st.empty()
-            shine_img = random.choice(card_shine_images)
-            with placeholder.container():
-                st.image(shine_img, width=150)
-                time.sleep(0.5)
-            placeholder.empty()
-
-            # 승패 결과
-            result_msg = play_round(st.session_state.class_num)
-            st.success(result_msg)
-
-            # 코인 및 통계 출력
-            st.markdown(f"💰 현재 코인: **{st.session_state.coins}**")
-            st.markdown(f"🎯 성공 횟수: **{st.session_state.successes}**  ❌ 실패 횟수: **{st.session_state.failures}**  총 시도: **{st.session_state.tries}**")
-
-            # 기록 저장 (구글 시트)
-            try:
-                now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                sheet.append_row([
-                    now,
-                    st.session_state.user_name,
-                    st.session_state.class_num,
-                    st.session_state.coins,
-                    st.session_state.successes,
-                    st.session_state.failures,
-                    st.session_state.tries,
-                    result_msg
-                ])
-            except Exception as e:
-                st.error(f"기록 저장 실패: {e}")
-
-        if st.button("게임 초기화"):
+        if st.button("게임 시작") and user_name.strip():
+            st.session_state.user_name = user_name.strip()
+            st.session_state.class_num = class_num
             reset_game()
-            st.success("게임이 초기화되었습니다!")
-
+            st.session_state.page = 'game'
+            st.experimental_rerun()
+            return
+    # 2️⃣ 게임 페이지
+    elif st.session_state.page == 'game':
+        st.subheader(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
+        if st.button("🃏 카드 선택 (1/2 확률 게임)"):
+            result_message = play_round(st.session_state.class_num)
+            st.write(result_message)
+            st.write(f"💰 현재 코인: {st.session_state.coins}")
+            st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
+        if st.button("그만하기 (게임 종료 및 설문조사)"):
+            st.session_state.page = 'survey'
+            st.experimental_rerun()
+            return
+    # 3️⃣ 설문 1
+    elif st.session_state.page == 'survey':
+        if st.session_state.user_name.strip() == "":
+            st.error("사용자 이름이 없습니다. 다시 시작해 주세요.")
+            st.session_state.page = 'start'
+            st.experimental_rerun()
+            return
+        st.header("📝 설문조사 (1/2)")
+        st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
+        q1 = st.radio("1. 게임의 흥미도는 어땠나요?", ["매우 흥미로움", "흥미로움", "보통", "흥미롭지 않음"])
+        q2 = st.radio("2. 게임이 공정하다고 느꼈나요?", ["매우 공정함", "공정함", "보통", "공정하지 않음"])
+        q3 = st.radio("3. 게임 중 충동을 느꼈나요?", ["매우 충동적임", "충동적임", "보통", "충동적이지 않음"])
+        q4 = st.text_area("4. 비슷한 실제 상황에는 무엇이 있다고 생각하나요?", max_chars=200)
+        if st.button("다음 (2/2 설문으로 이동)"):
+            st.session_state.q1 = q1
+            st.session_state.q2 = q2
+            st.session_state.q3 = q3
+            st.session_state.q4 = q4
+            st.session_state.page = 'survey2'
+            st.experimental_rerun()
+            return
+    # 4️⃣ 설문 2
+    elif st.session_state.page == 'survey2':
+        st.header("🎰 설문조사 (2/2) - 도박 관련")
+        q5 = st.radio("1. 이번 게임이 도박과 관련이 있다고 생각하나요?", 
+                      ["매우 그렇다", "그렇다", "보통이다", "그렇지 않다", "전혀 그렇지 않다"])
+        q6 = st.text_area("2. 그렇게 생각한 이유는 무엇인가요?", max_chars=300)
+        q7 = st.radio("3. 본인은 도박 중독 가능성이 있다고 생각하나요?", 
+                      ["전혀 없다", "거의 없다", "어느 정도 있다", "있는 편이다", "높다"])
+        q8 = st.radio("4. 이번 게임의 코인이 실제 돈이었다면, 이 게임을 계속했을 것 같나요?", 
+                      ["계속했을 것이다", "고민했을 것이다", "하지 않았을 것이다"])
+        if st.button("설문 최종 제출"):
+            now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            data = [
+                now_str,
+                st.session_state.user_name,
+                st.session_state.class_num,
+                st.session_state.tries,
+                st.session_state.successes,
+                st.session_state.failures,
+                st.session_state.coins,
+                st.session_state.q1,
+                st.session_state.q2,
+                st.session_state.q3,
+                st.session_state.q4,
+                q5, q6, q7, q8
+            ]
+            try:
+                sheet.append_row(data)
+                st.session_state.page = 'thanks'
+                st.experimental_rerun()
+                return
+            except Exception as e:
+                st.error(f"❌ 설문 제출 중 오류 발생: {e}")
+    # 5️⃣ 감사합니다 페이지
+    elif st.session_state.page == 'thanks':
+        st.title("🎉 참여 감사합니다!")
+        st.success("설문이 성공적으로 제출되었습니다.")
+        st.balloons()
         if st.button("처음으로 돌아가기"):
             st.session_state.page = 'start'
             st.experimental_rerun()
-
-    # 3️⃣ 예외 및 기타
-    else:
-        st.error("알 수 없는 페이지입니다. 새로고침 후 다시 시도하세요.")
-
+            return
 if __name__ == "__main__":
     main()
