@@ -38,43 +38,42 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-    # 🃏 폰트 적용 + 반응형 CSS 추가
-    st.markdown("""
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
-    <style>
-    html, body, [class*="css"] {
-        font-family: 'Bangers', cursive;
-    }
+   # 🃏 폰트 적용 + 반응형 CSS 추가
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<style>
+html, body, [class*="css"] {
+    font-family: 'Bangers', cursive;
+}
 
-    /* 본문 스타일 */
+/* 본문 스타일 */
+.responsive-text {
+    font-size: 24px;
+    color: #ffffff;
+    text-shadow: 1px 1px 3px #000;
+    line-height: 1.4;
+}
+
+/* 모바일 화면에서 폰트 크기 줄이기 */
+@media (max-width: 600px) {
     .responsive-text {
-        font-size: 24px;
-        color: #ffffff;
-        text-shadow: 1px 1px 3px #000;
-        line-height: 1.4;
+        font-size: 16px;
     }
+}
+</style>
+""", unsafe_allow_html=True)
 
-    /* 모바일 화면에서 폰트 크기 줄이기 */
-    @media (max-width: 600px) {
-        .responsive-text {
-            font-size: 16px;
-        }
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# 🎮 타이틀 (원하는 크기로 직접 스타일링 가능)
+st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
 
-
-    # 🎮 타이틀 (원하는 크기로 직접 스타일링 가능)
-    st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
-
-    # 반응형 텍스트
-    st.markdown("""
-    <p class="responsive-text">
-    🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
-    카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
-    맞출 수 있을까? 아니면 조커에게 놀아날까?
-    </p>
-    """, unsafe_allow_html=True)
+# 반응형 텍스트
+st.markdown("""
+<p class="responsive-text">
+🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
+카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
+맞출 수 있을까? 아니면 조커에게 놀아날까?
+</p>
+""", unsafe_allow_html=True)
 
 
     # 🔗 Google Sheets 연결
@@ -152,6 +151,7 @@ def main():
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
+
         if st.button("그만하기 (게임 종료 및 설문조사)"):
             st.session_state.page = 'survey'
             st.experimental_rerun()
@@ -212,13 +212,21 @@ def main():
             ]
             try:
                 sheet.append_row(data)
-                st.success("설문 및 게임 결과가 성공적으로 저장되었습니다. 감사합니다!")
+                st.session_state.page = 'thanks'
+                st.experimental_rerun()
+                return
             except Exception as e:
-                st.error(f"데이터 저장 중 오류가 발생했습니다: {e}")
+                st.error(f"❌ 설문 제출 중 오류 발생: {e}")
 
+    # 5️⃣ 감사합니다 페이지
+    elif st.session_state.page == 'thanks':
+        st.title("🎉 참여 감사합니다!")
+        st.success("설문이 성공적으로 제출되었습니다.")
+        st.balloons()
+        if st.button("처음으로 돌아가기"):
             st.session_state.page = 'start'
             st.experimental_rerun()
             return
 
 if __name__ == "__main__":
-    main()
+    main() 
