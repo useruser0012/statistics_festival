@@ -98,7 +98,41 @@ def main():
         "https://w7.pngwing.com/pngs/244/185/png-transparent-playing-card-card-game-ace-of-spades-joker-joker.png",
         "https://w7.pngwing.com/pngs/296/229/png-transparent-joker-playing-card-batman-text-messaging-black-card-white-mammal-heroes.png"
     ]
+def show_overlay(card_url):
+    overlay_placeholder = st.empty()
+    overlay_placeholder.markdown(
+        f"""
+        <div style="
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+        ">
+            <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h2>카드를 선택했습니다!</h2>
+                <img src="{card_url}" width="200"/>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    time.sleep(2)  # 2초 대기
+    overlay_placeholder.empty()  # 오버레이 제거
 
+st.title("카드 선택 예제")
+
+if 'selected_card' not in st.session_state:
+    st.session_state.selected_card = None
+
+if st.button("카드 선택"):
+    import random
+    selected = random.choice(card_shine_images)
+    st.session_state.selected_card = selected
+    show_overlay(selected)
+
+if st.session_state.selected_card:
+    st.write("선택된 카드:")
+    st.image(st.session_state.selected_card, width=150)
     # 상태 초기화 함수
     def reset_game():
         st.session_state.coins = 10
