@@ -149,67 +149,67 @@ def main():
             result_message = play_round(st.session_state.class_num)
             st.write(result_message)
                start_animation()
+            
+        # 카드 HTML/CSS/JS
+        card_html = f"""
+        <style>
+        @keyframes sparkle {{
+        0%, 100% {{text-shadow: 0 0 5px #fff, 0 0 10px #f0f, 0 0 20px #f0f;}}
+        50% {{text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 30px #f0f;}}
+    }}
 
-# 카드 HTML/CSS/JS
-card_html = f"""
-<style>
-@keyframes sparkle {{
-  0%, 100% {{text-shadow: 0 0 5px #fff, 0 0 10px #f0f, 0 0 20px #f0f;}}
-  50% {{text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 30px #f0f;}}
-}}
+        @keyframes spin {{
+        0% {{transform: rotate(0deg) scale(1);}}
+        100% {{transform: rotate(360deg) scale(1.2);}}
+    }}
 
-@keyframes spin {{
-  0% {{transform: rotate(0deg) scale(1);}}
-  100% {{transform: rotate(360deg) scale(1.2);}}
-}}
+        .card {{
+        font-size: 100px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 150px;
+        user-select: none;
+        margin: 20px auto;
+        opacity: 1;
+        transition: opacity 0.5s ease-out;
+    }}
 
-.card {{
-  font-size: 100px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 150px;
-  user-select: none;
-  margin: 20px auto;
-  opacity: 1;
-  transition: opacity 0.5s ease-out;
-}}
+        .sparkle {{
+        animation: sparkle 1s infinite;
+        color: #ff00ff;
+    }}
 
-.sparkle {{
-  animation: sparkle 1s infinite;
-  color: #ff00ff;
-}}
+        .spin {{
+        animation: spin 1.5s linear forwards;
+    }}
+    
+        .fadeout {{
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }}
 
-.spin {{
-  animation: spin 1.5s linear forwards;
-}}
+        .result {{
+        font-size: 36px;
+        color: #333;
+        text-align: center;
+        margin-top: 20px;
+    }}
+        </style>
 
-.fadeout {{
-  opacity: 0;
-  transition: opacity 0.5s ease-out;
-}}
+    <div id="card" class="card">🃏</div>
+    <div id="result" class="result"></div>
 
-.result {{
-  font-size: 36px;
-  color: #333;
-  text-align: center;
-  margin-top: 20px;
-}}
-</style>
+    <script>
+    const card = document.getElementById("card");
+    const result = document.getElementById("result");
 
-<div id="card" class="card">🃏</div>
-<div id="result" class="result"></div>
+    function runAnimation() {{
+    card.classList.remove("fadeout");
+    card.classList.add("sparkle");
 
-<script>
-const card = document.getElementById("card");
-const result = document.getElementById("result");
-
-function runAnimation() {{
-  card.classList.remove("fadeout");
-  card.classList.add("sparkle");
-
-  setTimeout(() => {{
+    setTimeout(() => {{
     card.classList.add("spin");
   }}, 1000);
 
