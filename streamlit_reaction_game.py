@@ -115,9 +115,9 @@ def main():
         return 0.5
 
     def play_round(class_num):
-    prob = get_success_probability(class_num)
-    success = random.random() < prob
-    st.session_state.tries += 1
+        prob = get_success_probability(class_num)
+        success = random.random() < prob
+        st.session_state.tries += 1
 
     # 7번째 시도일 때 강제 잭팟 (코인 증가만)
     if st.session_state.tries == 7:
