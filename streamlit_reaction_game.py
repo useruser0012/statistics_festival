@@ -37,7 +37,7 @@ def main():
     }}
     <style>
     /* 전역 텍스트 색상 흰색으로 고정 */
-    html, body, [class*="css"] {
+    html, body, [class*="css"] {{
         color: white !important;
     }}
     </style>
