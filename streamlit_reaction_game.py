@@ -96,34 +96,47 @@ def main():
             return 0.9
         return 0.5
 
-    def play_round(class_num):
+def play_round(class_num):
     prob = get_success_probability(class_num)
     success = random.random() < prob
     st.session_state.tries += 1
 
-    # 7번째 시도일 때 강제 잭팟 (코인 증가만)
+    # 7번째 시도일 때 강제 잭팟
     if st.session_state.tries == 7:
         delta = 500
         st.session_state.coins += delta
         if success:
             st.session_state.successes += 1
-            return f"🎉 대박 성공! 코인이 +{delta} 증가했군! 운이 좋으시네~"
+            return f"🎉 대박 성공! 7번째 시도에서 코인 +{delta}! 완전 행운의 주인공!"
         else:
             st.session_state.failures += 1
-            return f"🎉 대박 보너스! 코인이 +{delta} 증가했다! 자네는 행운의 여신과 함께하나?"
+            return f"😲 7번째 보너스! 실패했지만 코인 +{delta}! 신기한 일이군."
 
+    # 1% 확률로 잭팟
     jackpot_chance = 0.01
     if success:
         if random.random() < jackpot_chance:
             delta = 500
             st.session_state.coins += delta
             st.session_state.successes += 1
-            return f"🎉 대박 성공! 코인이 +{delta} 증가했다!"
+            return f"🎉 JACKPOT! 대박 성공! 코인이 +{delta} 증가했다!"
         else:
             delta = random.randint(30, 120)
             st.session_state.coins += delta
             st.session_state.successes += 1
-            return f"✅ 성공했군! 코인이 +{delta} 증가했다."
+            return f"✅ 성공! 코인이 +{delta} 증가했다."
+    else:
+        if random.random() < jackpot_chance:
+            delta = 500
+            st.session_state.coins += delta
+            st.session_state.failures += 1
+            return f"😲 실패했지만 JACKPOT 보너스! 코인이 +{delta} 증가했다!"
+        else:
+            delta = random.randint(50, 150)
+            st.session_state.coins -= delta
+            st.session_state.failures += 1
+            return f"❌ 실패! 코인이 -{delta} 감소했다."
+
     else:
         if random.random() < jackpot_chance:
             delta = 500
