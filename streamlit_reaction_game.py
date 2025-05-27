@@ -107,10 +107,10 @@ def play_round(class_num):
         st.session_state.coins += delta
         if success:
             st.session_state.successes += 1
-            return f"🎉 대박 성공! 7번째 시도에서 코인 +{delta}! 완전 행운의 주인공!"
+            return f"🎉 대박 성공! 코인 +{delta}! 완전 행운의 주인공!"
         else:
             st.session_state.failures += 1
-            return f"😲 7번째 보너스! 실패했지만 코인 +{delta}! 신기한 일이군."
+            return f"😲 보너스! 실패했지만 코인 +{delta}! 신기한 일이군."
 
     # 1% 확률로 잭팟
     jackpot_chance = 0.01
@@ -119,25 +119,13 @@ def play_round(class_num):
             delta = 500
             st.session_state.coins += delta
             st.session_state.successes += 1
-            return f"🎉 JACKPOT! 대박 성공! 코인이 +{delta} 증가했다!"
+            return f"🎉 대박 성공! 코인이 +{delta} 증가했다!"
         else:
             delta = random.randint(30, 120)
             st.session_state.coins += delta
             st.session_state.successes += 1
             return f"✅ 성공! 코인이 +{delta} 증가했다."
     else:
-        if random.random() < jackpot_chance:
-            delta = 500
-            st.session_state.coins += delta
-            st.session_state.failures += 1
-            return f"😲 실패했지만 JACKPOT 보너스! 코인이 +{delta} 증가했다!"
-        else:
-            delta = random.randint(50, 150)
-            st.session_state.coins -= delta
-            st.session_state.failures += 1
-            return f"❌ 실패! 코인이 -{delta} 감소했다."
-
-    elif:
         if random.random() < jackpot_chance:
             delta = 500
             st.session_state.failures += 1
