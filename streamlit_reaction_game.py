@@ -194,7 +194,7 @@ if st.session_state.show_overlay:
             st.error("사용자 이름이 없습니다. 다시 시작해 주세요.")
             st.session_state.page = 'start'
             st.experimental_rerun()
-            return
+            ##return
 
         st.header("📝 설문조사 (1/2)")
         st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
