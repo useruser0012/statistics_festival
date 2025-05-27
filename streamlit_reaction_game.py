@@ -82,9 +82,20 @@ def main():
 
         # 여기 바로 아래에 카드 빛나는 이미지 리스트를 선언해 주세요.
     card_shine_images = [
-        "https://www.pngwing.com/en/free-png-psffj", "https://www.pngwing.com/en/free-png-yuqlk", "https://www.pngwing.com/en/free-png-ddcnj", "https://www.pngwing.com/en/free-png-zqlsc", "https://www.pngwing.com/en/free-png-zkfbr", # 예시 이미지 URL (투명 배경 빛나는 카드)
-        "https://www.pngwing.com/en/free-png-mfmvo", "https://www.pngwing.com/en/free-png-igkuu", "https://www.pngwing.com/en/free-png-vqaql", "https://www.pngwing.com/en/free-png-ytpbp", "https://www.pngwing.com/en/free-png-yisgj"
-        "https://www.pngwing.com/en/free-png-czrqi", "https://www.pngwing.com/en/free-png-ywaoa", "https://www.pngwing.com/en/free-png-yvazh", "https://www.pngwing.com/en/free-png-bknvj"
+        "https://w7.pngwing.com/pngs/552/466/png-transparent-jokerz-computer-icons-playing-card-clown-joker-heroes-fictional-character-joker.png",
+        "https://w7.pngwing.com/pngs/658/87/png-transparent-black-and-gray-ace-card-united-states-playing-card-company-card-game-bicycle-plum-metal-plate-game-king-plate.png",
+        "https://w7.pngwing.com/pngs/279/765/png-transparent-ace-of-spade-playing-card-ace-of-spades-standard-52-card-deck-card-game-ace-card-game-emblem-king.png",
+        "https://w7.pngwing.com/pngs/902/280/png-transparent-ace-of-spades-playing-card-ace-of-hearts-spades-game-angle-king.png",
+        "https://w7.pngwing.com/pngs/154/969/png-transparent-ace-of-clubs-playing-card-ace-of-spades-playing-card-espadas-ace-card-game-heroes-monochrome.png", # 예시 이미지 URL (투명 배경 빛나는 카드)
+        "https://w7.pngwing.com/pngs/252/807/png-transparent-card-joker-harley-quinn.png",
+        "https://w7.pngwing.com/pngs/733/974/png-transparent-joker-emoji-playing-card-unicode-game-card-game-heroes-text.png",
+        "https://w7.pngwing.com/pngs/286/715/png-transparent-poker-playing-card-ace-of-spades-jack-joker-white-heroes-text.png", 
+        "https://w7.pngwing.com/pngs/344/854/png-transparent-playing-card-four-card-poker-joker-standard-52-card-deck-three-card-poker-spade-game-angle-heroes.png",
+        "https://w7.pngwing.com/pngs/741/485/png-transparent-playing-card-card-game-cult-film-poker-joker-game-heroes-logo.png"
+        "https://w7.pngwing.com/pngs/800/372/png-transparent-joker-playing-card-graphy-card-game-joker-king-heroes-photography.png",
+        "https://w7.pngwing.com/pngs/531/586/png-transparent-joker-bicycle-playing-cards-united-states-playing-card-company-card-game-joker-king-heroes-text.png",
+        "https://w7.pngwing.com/pngs/244/185/png-transparent-playing-card-card-game-ace-of-spades-joker-joker.png", 
+        "https://w7.pngwing.com/pngs/296/229/png-transparent-joker-playing-card-batman-text-messaging-black-card-white-mammal-heroes.png"
     ]
 
     # 상태 초기화
