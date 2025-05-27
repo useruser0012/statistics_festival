@@ -118,6 +118,7 @@ if st.session_state.page == 'start':
         reset_game()
         st.session_state.page = 'game'
         st.experimental_rerun()
+        return
 
 # 2️⃣ 게임 페이지
 elif st.session_state.page == 'game':
@@ -133,6 +134,7 @@ elif st.session_state.page == 'game':
     if st.button("그만하기 (게임 종료 및 설문조사)"):
         st.session_state.page = 'survey'
         st.experimental_rerun()
+        return
 
 # 3️⃣ 설문 1
 elif st.session_state.page == 'survey':
