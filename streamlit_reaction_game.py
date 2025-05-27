@@ -50,36 +50,7 @@ def main():
         color: #ffffff;
         text-shadow: 1px 1px 3px #000;
         line-height: 1.4;
-    }
-    @media (max-width: 600px) {
-        .responsive-text {
-            font-size: 16px;
-   가"
-
-        # 1% 확률로 잭팟
-        jackpot_chance = 0.01
-        if success:
-            if random.random() < jackpot_chance:
-                delta = 500
-                st.session_state.coins += delta
-                st.session_state.successes += 1
-                return f"🎉 대박 성공! 코인이 +{delta} 증가했다!"
-            else:
-                delta = random.randint(30, 120)
-                st.session_state.coins += delta
-                st.session_state.successes += 1
-                return f"✅ 성공! 코인이 +{delta} 증가했다."
-        else:
-            if random.random() < jackpot_chance:
-                delta = 500
-                st.session_state.failures += 1
-                st.session_state.coins += delta  # 실패해도 잭팟은 증가만
-                return f"😲 실패했지만 보너스! 코인이 +{delta} 증가했다!"
-            else:
-                delta = random.randint(50, 150)  # 감소 폭 증가
-                st.session_state.coins -= delta
-                st.session_state.failures += 1
-                return f"❌ 실패! 코인이 -{delta} 감소했다. 아.. 한 끗 차이였는데?"
+    인데?"
 
     # 세션 초기화
     if 'page' not in st.session_state:
