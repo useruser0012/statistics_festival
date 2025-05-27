@@ -137,7 +137,7 @@ def play_round(class_num):
             st.session_state.failures += 1
             return f"❌ 실패! 코인이 -{delta} 감소했다."
 
-    else:
+    elif:
         if random.random() < jackpot_chance:
             delta = 500
             st.session_state.failures += 1
