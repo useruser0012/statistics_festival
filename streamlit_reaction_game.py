@@ -82,9 +82,9 @@ def main():
 
         # 여기 바로 아래에 카드 빛나는 이미지 리스트를 선언해 주세요.
     card_shine_images = [
-        "https://i.imgur.com/0X1N6vI.png",  # 예시 이미지 URL (투명 배경 빛나는 카드)
-        "https://i.imgur.com/AhU6bKf.png",
-        "https://i.imgur.com/07hH9BR.png"
+        "https://www.pngwing.com/en/free-png-psffj", "https://www.pngwing.com/en/free-png-yuqlk", "https://www.pngwing.com/en/free-png-ddcnj", "https://www.pngwing.com/en/free-png-zqlsc", "https://www.pngwing.com/en/free-png-zkfbr", # 예시 이미지 URL (투명 배경 빛나는 카드)
+        "https://www.pngwing.com/en/free-png-mfmvo", "https://www.pngwing.com/en/free-png-igkuu", "https://www.pngwing.com/en/free-png-vqaql", "https://www.pngwing.com/en/free-png-ytpbp", "https://www.pngwing.com/en/free-png-yisgj"
+        "https://www.pngwing.com/en/free-png-czrqi", "https://www.pngwing.com/en/free-png-ywaoa", "https://www.pngwing.com/en/free-png-yvazh", "https://www.pngwing.com/en/free-png-bknvj"
     ]
 
     # 상태 초기화
