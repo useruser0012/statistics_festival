@@ -148,7 +148,9 @@ def main():
         if st.button("🃏 카드 선택 (1/2 확률 게임)"):
             result_message = play_round(st.session_state.class_num)
             st.write(result_message)
-            # 카드 + 애니메이션 CSS + JS
+               start_animation()
+
+# 카드 HTML/CSS/JS
 card_html = f"""
 <style>
 @keyframes sparkle {{
@@ -204,10 +206,13 @@ const card = document.getElementById("card");
 const result = document.getElementById("result");
 
 function runAnimation() {{
+  card.classList.remove("fadeout");
   card.classList.add("sparkle");
+
   setTimeout(() => {{
     card.classList.add("spin");
   }}, 1000);
+
   setTimeout(() => {{
     card.classList.add("fadeout");
     card.classList.remove("sparkle", "spin");
@@ -221,13 +226,9 @@ window.runAnimation = runAnimation;
 
 st.markdown(card_html, unsafe_allow_html=True)
 
+# 애니메이션 실행
 if st.session_state.animate:
-    st.markdown("""
-    <script>
-    runAnimation();
-    </script>
-    """, unsafe_allow_html=True)
-    # 상태 초기화 (다음 클릭을 위해)
+    st.markdown("<script>runAnimation();</script>", unsafe_allow_html=True)
     st.session_state.animate = False
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
