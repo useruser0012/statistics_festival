@@ -135,8 +135,12 @@ if st.session_state.page == 'start':
         st.session_state.class_num = class_num
         reset_game()
         st.session_state.page = 'game'
-        st.experimental_rerun()
+        st.session_state.trigger_rerun = True  # rerun 예약
 
+    # rerun은 다음 루프에서 실행
+    if st.session_state.get("trigger_rerun", False):
+        st.session_state.trigger_rerun = False
+        st.experimental_rerun()
 
 
 # 2. 게임 페이지
