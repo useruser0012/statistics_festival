@@ -105,11 +105,11 @@ def main():
         if success:
             st.session_state.coins += delta
             st.session_state.successes += 1
-            return f"✅ 성공! 코인이 +{delta} 증가했습니다."
+            return f"✅ 성공했군! 코인이 +{delta} 증가했다."
         else:
             st.session_state.coins -= delta
             st.session_state.failures += 1
-            return f"❌ 실패! 코인이 -{delta} 감소했습니다."
+            return f"❌ 낄낄낄 실패! 코인이 -{delta} 감소했다."
 
     # 세션 초기화
     if 'page' not in st.session_state:
