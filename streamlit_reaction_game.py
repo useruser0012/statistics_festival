@@ -79,7 +79,7 @@ def main():
                 delta = random.randint(50, 150)  # 감소 폭 증가
                 st.session_state.coins -= delta
                 st.session_state.failures += 1
-                return f"❌ 실패! 코인이 -{delta} 감소했다. 아.. 한 끗 차이인데?"
+                return f"❌ 실패! 코인이 -{delta} 감소했다. 아.. 한 끗 차이였는데?"
 
     # 세션 초기화
     if 'page' not in st.session_state:
