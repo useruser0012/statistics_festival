@@ -151,8 +151,8 @@ st.markdown("""
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
              # 스파클 애니메이션 보여주기 (예: GIF URL 사용)
-    sparkle_url = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"
-    st.image(sparkle_url, width=150)
+            sparkle_url = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"
+            st.image(sparkle_url, width=150)
 
 
         if st.button("그만하기 (게임 종료 및 설문조사)"):
