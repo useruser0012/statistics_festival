@@ -148,6 +148,87 @@ def main():
         if st.button("🃏 카드 선택 (1/2 확률 게임)"):
             result_message = play_round(st.session_state.class_num)
             st.write(result_message)
+            # 카드 + 애니메이션 CSS + JS
+card_html = f"""
+<style>
+@keyframes sparkle {{
+  0%, 100% {{text-shadow: 0 0 5px #fff, 0 0 10px #f0f, 0 0 20px #f0f;}}
+  50% {{text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 30px #f0f;}}
+}}
+
+@keyframes spin {{
+  0% {{transform: rotate(0deg) scale(1);}}
+  100% {{transform: rotate(360deg) scale(1.2);}}
+}}
+
+.card {{
+  font-size: 100px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  user-select: none;
+  margin: 20px auto;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}}
+
+.sparkle {{
+  animation: sparkle 1s infinite;
+  color: #ff00ff;
+}}
+
+.spin {{
+  animation: spin 1.5s linear forwards;
+}}
+
+.fadeout {{
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}}
+
+.result {{
+  font-size: 36px;
+  color: #333;
+  text-align: center;
+  margin-top: 20px;
+}}
+</style>
+
+<div id="card" class="card">🃏</div>
+<div id="result" class="result"></div>
+
+<script>
+const card = document.getElementById("card");
+const result = document.getElementById("result");
+
+function runAnimation() {{
+  card.classList.add("sparkle");
+  setTimeout(() => {{
+    card.classList.add("spin");
+  }}, 1000);
+  setTimeout(() => {{
+    card.classList.add("fadeout");
+    card.classList.remove("sparkle", "spin");
+    result.textContent = "{st.session_state.result}";
+  }}, 2500);
+}}
+
+window.runAnimation = runAnimation;
+</script>
+"""
+
+st.markdown(card_html, unsafe_allow_html=True)
+
+if st.session_state.animate:
+    st.markdown("""
+    <script>
+    runAnimation();
+    </script>
+    """, unsafe_allow_html=True)
+    # 상태 초기화 (다음 클릭을 위해)
+    st.session_state.animate = False
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
