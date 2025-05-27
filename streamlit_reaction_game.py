@@ -54,68 +54,7 @@ def main():
     @media (max-width: 600px) {
         .responsive-text {
             font-size: 16px;
-        }
-    }
-    <style>
-    /* 전역 텍스트 색상 흰색으로 고정 */
-    html, body, [class*="css"] {
-        color: white !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
-    st.markdown("""
-    <p class="responsive-text">
-    🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
-    카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
-    맞출 수 있을까? 아니면 조커에게 놀아날까?
-    </p>
-    """, unsafe_allow_html=True)
-
-    # 🔗 Google Sheets 연결
-    try:
-        creds = Credentials.from_service_account_info(
-            st.secrets["gcp_service_account"],
-            scopes=['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        )
-        client = gspread.authorize(creds)
-        sheet = client.open("도파민 타이밍 게임 기록").sheet1
-    except Exception as e:
-        st.error(f"Google Sheets 연결 실패: {e}")
-        return
-
-    # 상태 초기화
-    def reset_game():
-        st.session_state.coins = 10
-        st.session_state.successes = 0
-        st.session_state.failures = 0
-        st.session_state.tries = 0
-
-    def get_success_probability(class_num):
-        if class_num in [1, 3, 5, 7, 9]:
-            return 0.5
-        elif class_num in [2, 6, 10]:
-            return 0.1
-        elif class_num in [4, 8]:
-            return 0.9
-        return 0.5
-
-    def play_round(class_num):
-        prob = get_success_probability(class_num)
-        success = random.random() < prob
-        st.session_state.tries += 1
-
-        # 7번째 시도일 때 강제 잭팟
-        if st.session_state.tries == 7:
-            delta = 500
-            st.session_state.coins += delta
-            if success:
-                st.session_state.successes += 1
-                return f"🎉 대박 성공! 코인 +{delta}! 완전 행운의 주인공!"
-            else:
-                st.session_state.failures += 1
-                return f"😲 보너스! 실패했지만 코인 +{delta}! 신기한 일이군."
+   가"
 
         # 1% 확률로 잭팟
         jackpot_chance = 0.01
