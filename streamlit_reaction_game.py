@@ -76,7 +76,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-    # 🔗 Google Sheets 연결
+# 🔗 Google Sheets 연결
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scope)
     client = gspread.authorize(creds)
