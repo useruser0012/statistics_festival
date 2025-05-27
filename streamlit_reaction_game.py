@@ -172,15 +172,7 @@ def main():
                 box-shadow: 0 0 20px 5px gold;
                 user-select: none;
             }
-            #close-btn {
-                position: absolute;
-                top: 20px; right: 30px;
-                font-size: 2rem;
-                color: white;
-                cursor: pointer;
-                user-select: none;
-                z-index: 10000;
-            }
+           
             </style>
 
             <div id="overlay" onclick="document.getElementById('overlay').style.display='none';">
@@ -197,6 +189,10 @@ def main():
             </script>
             """
             st.markdown(overlay_html, unsafe_allow_html=True)
+              # 오버레이 닫기용 Streamlit 버튼 — 이 버튼을 눌러 상태를 바꾸고 다시 렌더링
+            if st.button("✖ 닫기"):
+                st.session_state.show_overlay = False
+                st.experimental_rerun()
 
 
         if st.button("그만하기 (게임 종료 및 설문조사)"):
