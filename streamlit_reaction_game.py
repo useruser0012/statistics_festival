@@ -150,6 +150,63 @@ def main():
             st.session_state.page = 'survey'
             st.experimental_rerun()
             return
+            if st.session_state.show_overlay:
+        overlay_html = """
+        <style>
+        /* 모달 오버레이 스타일 */
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #card {
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 6rem;
+            animation: bounceIn 0.8s forwards;
+            box-shadow: 0 0 20px 5px gold;
+            user-select: none;
+        }
+        @keyframes bounceIn {
+            0% {transform: scale(0); opacity:0;}
+            60% {transform: scale(1.1); opacity:1;}
+            80% {transform: scale(0.95);}
+            100% {transform: scale(1);}
+        }
+        #close-btn {
+            position: absolute;
+            top: 20px; right: 30px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+        </style>
+
+        <div id="overlay">
+            <div id="close-btn" onclick="closeOverlay()">✖</div>
+            <div id="card">🃏</div>
+            <audio id="sound" src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" autoplay></audio>
+        </div>
+
+        <script>
+        function closeOverlay() {
+            const overlay = document.getElementById("overlay");
+            overlay.style.display = "none";
+            // Streamlit 쪽 상태를 false로 변경 요청
+            window.parent.postMessage({streamlit:{method:"streamlit:setComponentValue", value:false}}, "*");
+        }
+        </script>
+        """
             
 
     # 3️⃣ 설문 1
