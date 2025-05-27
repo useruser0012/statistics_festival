@@ -38,42 +38,42 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-   # 🃏 폰트 적용 + 반응형 CSS 추가
-st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
-<style>
-html, body, [class*="css"] {
-    font-family: 'Bangers', cursive;
-}
-
-/* 본문 스타일 */
-.responsive-text {
-    font-size: 24px;
-    color: #ffffff;
-    text-shadow: 1px 1px 3px #000;
-    line-height: 1.4;
-}
-
-/* 모바일 화면에서 폰트 크기 줄이기 */
-@media (max-width: 600px) {
-    .responsive-text {
-        font-size: 16px;
+    # 🃏 폰트 적용 + 반응형 CSS 추가
+    st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <style>
+    html, body, [class*="css"] {
+        font-family: 'Bangers', cursive;
     }
-}
-</style>
-""", unsafe_allow_html=True)
 
-# 🎮 타이틀 (원하는 크기로 직접 스타일링 가능)
-st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
+    /* 본문 스타일 */
+    .responsive-text {
+        font-size: 24px;
+        color: #ffffff;
+        text-shadow: 1px 1px 3px #000;
+        line-height: 1.4;
+    }
 
-# 반응형 텍스트
-st.markdown("""
-<p class="responsive-text">
-🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
-카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
-맞출 수 있을까? 아니면 조커에게 놀아날까?
-</p>
-""", unsafe_allow_html=True)
+    /* 모바일 화면에서 폰트 크기 줄이기 */
+    @media (max-width: 600px) {
+        .responsive-text {
+            font-size: 16px;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # 🎮 타이틀 (원하는 크기로 직접 스타일링 가능)
+    st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
+
+    # 반응형 텍스트
+    st.markdown("""
+    <p class="responsive-text">
+    🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
+    카드를 뒤집고, 너의 직감을 시험해봐! 🃏💥<br>
+    맞출 수 있을까? 아니면 조커에게 놀아날까?
+    </p>
+    """, unsafe_allow_html=True)
 
 
     # 🔗 Google Sheets 연결
@@ -142,18 +142,15 @@ st.markdown("""
     # 2️⃣ 게임 페이지
     elif st.session_state.page == 'game':
         st.subheader(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
-        
-        #st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
         if st.button("🃏 카드 선택 (1/2 확률 게임)"):
             result_message = play_round(st.session_state.class_num)
             st.write(result_message)
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
-             # 스파클 애니메이션 보여주기 (예: GIF URL 사용)
+            # 스파클 애니메이션 보여주기 (예: GIF URL 사용)
             sparkle_url = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"
             st.image(sparkle_url, width=150)
-
 
         if st.button("그만하기 (게임 종료 및 설문조사)"):
             st.session_state.page = 'survey'
