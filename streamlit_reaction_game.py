@@ -112,10 +112,10 @@ def main():
             st.session_state.coins += delta
             if success:
                 st.session_state.successes += 1
-                return f"🎉 대박 성공! 코인 +{delta}! 완전 행운의 주인공!"
+                return f"🎉 헉, 대박 성공! 코인 +{delta}! 당신은 1%의 주인공!"
             else:
                 st.session_state.failures += 1
-                return f"😲 보너스! 실패했지만 코인 +{delta}! 신기한 일이군."
+                return f"😲 이게 (진짜로)어떻게 나왔지?? 보너스! 코인 +{delta}! 신기한 일이군."
 
         # 1% 확률로 잭팟
         jackpot_chance = 0.01
@@ -124,7 +124,7 @@ def main():
                 delta = 500
                 st.session_state.coins += delta
                 st.session_state.successes += 1
-                return f"🎉 대박 성공! 코인이 +{delta} 증가했다!"
+                return f"🎉 당신은 1%의 주인공! 대박 성공! 코인이 +{delta} 증가했다!"
             else:
                 delta = random.randint(30, 120)
                 st.session_state.coins += delta
@@ -135,12 +135,12 @@ def main():
                 delta = 500
                 st.session_state.failures += 1
                 st.session_state.coins += delta  # 실패해도 잭팟은 증가만
-                return f"😲 실패했지만 보너스! 코인이 +{delta} 증가했다!"
+                return f"😲 이거 어떻게 뽑으셨어요? 코인이 +{delta} 증가했다!"
             else:
                 delta = random.randint(50, 150)  # 감소 폭 증가
                 st.session_state.coins -= delta
                 st.session_state.failures += 1
-                return f"❌ 낄낄낄 실패! 코인이 -{delta} 감소했다."
+                return f"❌ 실패! 코인이 -{delta} 감소했다. 아.. 좀 아쉬웠는데?"
 
     # 세션 초기화
     if 'page' not in st.session_state:
