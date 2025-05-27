@@ -209,6 +209,7 @@ if st.session_state.selected_card:
             st.session_state.page = 'game'
             st.experimental_rerun()
             return
+            
     # 2️⃣ 게임 페이지
     elif st.session_state.page == 'game':
         st.subheader(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
