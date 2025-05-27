@@ -149,8 +149,7 @@ def main():
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
-           # 오버레이 상태 초기화
-            if 'show_overlay' not in st.session_state:
+            # 오버레이 상태 초기화
             st.session_state.show_overlay = False
 
     def show_overlay():
@@ -186,7 +185,6 @@ def main():
         if st.button("오버레이 닫기"):
             hide_overlay()
             st.experimental_rerun()
-            
 
     # 3️⃣ 설문 1
     elif st.session_state.page == 'survey':
@@ -194,7 +192,7 @@ def main():
             st.error("사용자 이름이 없습니다. 다시 시작해 주세요.")
             st.session_state.page = 'start'
             st.experimental_rerun()
-            ##return
+            return
 
         st.header("📝 설문조사 (1/2)")
         st.write(f"{st.session_state.user_name}님, 게임에 참여해 주셔서 감사합니다!")
@@ -215,49 +213,37 @@ def main():
 
     # 4️⃣ 설문 2
     elif st.session_state.page == 'survey2':
-        st.header("🎰 설문조사 (2/2) - 도박 관련")
+        st.header("📝 설문조사 (2/2)")
+        st.write(f"{st.session_state.user_name}님, 마지막 설문입니다!")
 
-        q5 = st.radio("1. 이번 게임이 도박과 관련이 있다고 생각하나요?", 
-                      ["매우 그렇다", "그렇다", "보통이다", "그렇지 않다", "전혀 그렇지 않다"])
-        q6 = st.text_area("2. 그렇게 생각한 이유는 무엇인가요?", max_chars=300)
-        q7 = st.radio("3. 본인은 도박 중독 가능성이 있다고 생각하나요?", 
-                      ["전혀 없다", "거의 없다", "어느 정도 있다", "있는 편이다", "높다"])
-        q8 = st.radio("4. 이번 게임의 코인이 실제 돈이었다면, 이 게임을 계속했을 것 같나요?", 
-                      ["계속했을 것이다", "고민했을 것이다", "하지 않았을 것이다"])
+        q5 = st.radio("5. 게임 결과가 실제 도박과 비슷하다고 생각하나요?", ["매우 비슷함", "비슷함", "보통", "비슷하지 않음"])
+        q6 = st.radio("6. 게임 후 기분은 어땠나요?", ["매우 좋음", "좋음", "보통", "나쁨"])
+        q7 = st.radio("7. 게임을 다시 하고 싶나요?", ["매우 그렇다", "그렇다", "보통", "아니다"])
 
-        if st.button("설문 최종 제출"):
-            now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            data = [
-                now_str,
+        if st.button("제출하기"):
+            # 구글 시트에 저장
+            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            record = [
+                now,
                 st.session_state.user_name,
                 st.session_state.class_num,
-                st.session_state.tries,
+                st.session_state.coins,
                 st.session_state.successes,
                 st.session_state.failures,
-                st.session_state.coins,
+                st.session_state.tries,
                 st.session_state.q1,
                 st.session_state.q2,
                 st.session_state.q3,
                 st.session_state.q4,
-                q5, q6, q7, q8
+                q5,
+                q6,
+                q7
             ]
-            try:
-                sheet.append_row(data)
-                st.session_state.page = 'thanks'
-                st.experimental_rerun()
-                return
-            except Exception as e:
-                st.error(f"❌ 설문 제출 중 오류 발생: {e}")
+            sheet.append_row(record)
 
-    # 5️⃣ 감사합니다 페이지
-    elif st.session_state.page == 'thanks':
-        st.title("🎉 참여 감사합니다!")
-        st.success("설문이 성공적으로 제출되었습니다.")
-        st.balloons()
-        if st.button("처음으로 돌아가기"):
+            st.success("설문이 제출되었습니다. 참여해 주셔서 감사합니다!")
             st.session_state.page = 'start'
             st.experimental_rerun()
-            return
 
 if __name__ == "__main__":
     main()
