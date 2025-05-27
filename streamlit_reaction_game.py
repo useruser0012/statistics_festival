@@ -203,9 +203,9 @@ def main():
 
     st.markdown(overlay_html, unsafe_allow_html=True)
             # 1초 기다렸다가 오버레이 상태 끄기 (재렌더링 위해)
-            time.sleep(1)
-            st.session_state.show_overlay = False
-            st.experimental_rerun()
+        time.sleep(1)
+        st.session_state.show_overlay = False
+        st.experimental_rerun()
 
         if st.button("그만하기 (게임 종료 및 설문조사)"):
             st.session_state.page = 'survey'
