@@ -124,13 +124,15 @@ def main():
     # 2️⃣ 게임 페이지
     elif st.session_state.page == 'game':
         st.subheader(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
-        st.write(f"💰 현재 코인: {st.session_state.coins}")
-        st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
+        
+        #st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
         if st.button("🃏 카드 선택 (1/2 확률 게임)"):
             result_message = play_round(st.session_state.class_num)
             st.write(result_message)
             st.write(f"💰 현재 코인: {st.session_state.coins}")
+            st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
+
 
         if st.button("그만하기 (게임 종료 및 설문조사)"):
             st.session_state.page = 'survey'
