@@ -208,7 +208,7 @@ if st.session_state.selected_card:
             reset_game()
             st.session_state.page = 'game'
             st.experimental_rerun()
-            return
+            #return
             
     # 2️⃣ 게임 페이지
     elif st.session_state.page == 'game':
