@@ -150,42 +150,42 @@ def main():
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
            # 오버레이 상태 초기화
-if 'show_overlay' not in st.session_state:
-    st.session_state.show_overlay = False
+            if 'show_overlay' not in st.session_state:
+            st.session_state.show_overlay = False
 
-def show_overlay():
-    st.session_state.show_overlay = True
+    def show_overlay():
+        st.session_state.show_overlay = True
 
-def hide_overlay():
-    st.session_state.show_overlay = False
+    def hide_overlay():
+        st.session_state.show_overlay = False
 
-st.button("오버레이 열기", on_click=show_overlay)
+    st.button("오버레이 열기", on_click=show_overlay)
 
-if st.session_state.show_overlay:
-    overlay_html = """
-    <style>
-    #overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        color: white;
-        font-size: 3rem;
-        user-select: none;
-    }
-    </style>
-    <div id="overlay">
-        오버레이가 열렸습니다!
-    </div>
-    """
-    st.markdown(overlay_html, unsafe_allow_html=True)
-
-    if st.button("오버레이 닫기"):
-        hide_overlay()
-        st.experimental_rerun()
+    if st.session_state.show_overlay:
+        overlay_html = """
+        <style>
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 3rem;
+            user-select: none;
+        }
+        </style>
+        <div id="overlay">
+            오버레이가 열렸습니다!
+        </div>
+        """
+        st.markdown(overlay_html, unsafe_allow_html=True)
+    
+        if st.button("오버레이 닫기"):
+            hide_overlay()
+            st.experimental_rerun()
             
 
     # 3️⃣ 설문 1
