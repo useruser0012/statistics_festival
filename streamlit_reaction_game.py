@@ -186,14 +186,14 @@ def main():
             <script>
             const audio = document.getElementById('sound');
             audio.play().catch(e => console.log("Autoplay prevented:", e));
+             // 2초 뒤에 오버레이 숨기기 (UI만)
+            setTimeout(() => {
+                const overlay = document.getElementById('overlay');
+                if(overlay) overlay.style.display = 'none';
+            }, 2000);
             </script>
             """
             st.markdown(overlay_html, unsafe_allow_html=True)
-              # 오버레이 닫기용 Streamlit 버튼 — 이 버튼을 눌러 상태를 바꾸고 다시 렌더링
-            if st.button("✖ 닫기"):
-                st.session_state.show_overlay = False
-                st.experimental_rerun()
-
 
         if st.button("그만하기 (게임 종료 및 설문조사)"):
             st.session_state.page = 'survey'
