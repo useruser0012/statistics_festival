@@ -150,7 +150,7 @@ def main():
             st.session_state.page = 'survey'
             st.experimental_rerun()
             return
-            if st.session_state.show_overlay:
+        if st.session_state.show_overlay:
         overlay_html = """
         <style>
         /* 모달 오버레이 스타일 */
