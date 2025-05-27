@@ -150,72 +150,7 @@ def main():
             st.session_state.page = 'survey'
             st.experimental_rerun()
             return
-             # 여기서 HTML + JS 카드 애니메이션 컴포넌트 삽입
-        st.markdown("---")
-        st.markdown("### 🎴 카드 애니메이션 & 사운드 체험")
-        html_code = """
-        <button id="startBtn">시작</button>
-        <div id="card" style="display:none;">🃏</div>
-
-        <!-- 사운드 -->
-        <audio id="bgm" src="https://cdn.pixabay.com/audio/2022/03/22/audio_6f3f21f1e2.mp3" preload="auto"></audio>
-        <audio id="cardSound" src="https://cdn.pixabay.com/audio/2023/03/15/audio_0b4cf3c5fc.mp3" preload="auto"></audio>
-        <audio id="popSound" src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" preload="auto"></audio>
-
-        <style>
-        #card {
-          width: 200px;
-          height: 300px;
-          background-color: white;
-          border-radius: 12px;
-          position: relative;
-          margin: 20px auto;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-size: 3rem;
-          box-shadow: 0 4px 30px rgba(255, 255, 255, 0.2);
-          animation: bounceIn 0.8s forwards;
-          transform-origin: center center;
-        }
-
-        @keyframes bounceIn {
-          0% {
-            transform: scale(0);
-            opacity: 0;
-          }
-          60% {
-            transform: scale(1.1);
-            opacity: 1;
-          }
-          80% {
-            transform: scale(0.95);
-          }
-          100% {
-            transform: scale(1);
-          }
-        }
-        </style>
-
-        <script>
-        const startBtn = document.getElementById('startBtn');
-        const card = document.getElementById('card');
-        const bgm = document.getElementById('bgm');
-        const cardSound = document.getElementById('cardSound');
-        const popSound = document.getElementById('popSound');
-
-        startBtn.onclick = () => {
-            startBtn.style.display = 'none';
-            card.style.display = 'flex';
-            bgm.play();
-            cardSound.play();
-            setTimeout(() => {
-                popSound.play();
-            }, 700);
-        };
-        </script>
-        """
-        st.components.v1.html(html_code, height=400)
+            
 
     # 3️⃣ 설문 1
     elif st.session_state.page == 'survey':
