@@ -77,10 +77,10 @@ st.markdown("""
 
 
 # 🔗 Google Sheets 연결
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-    creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scope)
-    client = gspread.authorize(creds)
-    sheet = client.open("도파민 타이밍 게임 기록").sheet1
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scope)
+client = gspread.authorize(creds)
+sheet = client.open("도파민 타이밍 게임 기록").sheet1
 
     # 🌟 게임 상태 초기화 함수
     def reset_game():
