@@ -141,72 +141,68 @@ def main():
         st.subheader(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
 
         if st.button("🃏 카드 선택 (1/2 확률 게임)"):
+            st.session_state.show_overlay = True
             result_message = play_round(st.session_state.class_num)
             st.write(result_message)
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
+             # 오버레이 출력
+        if st.session_state.show_overlay:
+            overlay_html = """
+            <style>
+            #overlay {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+            #card {
+                width: 300px;
+                height: 400px;
+                background: white;
+                border-radius: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 6rem;
+                box-shadow: 0 0 20px 5px gold;
+                user-select: none;
+            }
+            #close-btn {
+                position: absolute;
+                top: 20px; right: 30px;
+                font-size: 2rem;
+                color: white;
+                cursor: pointer;
+                user-select: none;
+                z-index: 10000;
+            }
+            </style>
+
+            <div id="overlay" onclick="document.getElementById('overlay').style.display='none';">
+                <div id="close-btn" onclick="document.getElementById('overlay').style.display='none'; event.stopPropagation();">✖</div>
+                <div id="card">🃏</div>
+                <audio id="sound" autoplay>
+                  <source src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+            <script>
+            const audio = document.getElementById('sound');
+            audio.play().catch(e => console.log("Autoplay prevented:", e));
+            </script>
+            """
+            st.markdown(overlay_html, unsafe_allow_html=True)
+
+
         if st.button("그만하기 (게임 종료 및 설문조사)"):
             st.session_state.page = 'survey'
             st.experimental_rerun()
             return
-        if st.session_state.show_overlay:
-        overlay_html = """
-        <style>
-        /* 모달 오버레이 스타일 */
-        #overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        #card {
-            width: 300px;
-            height: 400px;
-            background: white;
-            border-radius: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 6rem;
-            animation: bounceIn 0.8s forwards;
-            box-shadow: 0 0 20px 5px gold;
-            user-select: none;
-        }
-        @keyframes bounceIn {
-            0% {transform: scale(0); opacity:0;}
-            60% {transform: scale(1.1); opacity:1;}
-            80% {transform: scale(0.95);}
-            100% {transform: scale(1);}
-        }
-        #close-btn {
-            position: absolute;
-            top: 20px; right: 30px;
-            font-size: 2rem;
-            color: white;
-            cursor: pointer;
-            user-select: none;
-        }
-        </style>
-
-        <div id="overlay">
-            <div id="close-btn" onclick="closeOverlay()">✖</div>
-            <div id="card">🃏</div>
-            <audio id="sound" src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" autoplay></audio>
-        </div>
-
-        <script>
-        function closeOverlay() {
-            const overlay = document.getElementById("overlay");
-            overlay.style.display = "none";
-            // Streamlit 쪽 상태를 false로 변경 요청
-            window.parent.postMessage({streamlit:{method:"streamlit:setComponentValue", value:false}}, "*");
-        }
-        </script>
-        """
             
 
     # 3️⃣ 설문 1
