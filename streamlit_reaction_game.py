@@ -149,69 +149,74 @@ def main():
             st.write(f"💰 현재 코인: {st.session_state.coins}")
             st.write(f"📊 도전 횟수: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
 
-             # 오버레이 출력
-        if st.session_state.show_overlay:
-            overlay_html = """
-            <style>
-            #overlay {
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: rgba(0,0,0,0.7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-            }
-            #card {
-                width: 300px;
-                height: 400px;
-                background: white;
-                border-radius: 20px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: 6rem;
-                box-shadow: 0 0 20px 5px gold;
-                user-select: none;    
-            }
-            #close-btn {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                font-size: 2rem;
-                cursor: pointer;
-                color: black;
-                user-select: none;
-            }
-            </style>
+            # 오버레이가 켜져 있을 때만 화면에 표시
+    if st.session_state.show_overlay:
+        overlay_html = """
+        <style>
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #card {
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 6rem;
+            box-shadow: 0 0 20px 5px gold;
+            user-select: none;    
+        }
+        #close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: black;
+            user-select: none;
+        }
+        </style>
 
-            <div id="overlay" onclick="this.style.display='none'">
-                <div id="close-btn" onclick="event.stopPropagation(); this.parentElement.style.display='none';">✖</div>
-                <div id="card">🃏</div>
-                <audio id="sound" autoplay>
-                    <source src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" type="audio/mpeg">
-                </audio>
-            </div>
+        <div id="overlay">
+            <div id="close-btn">✖</div>
+            <div id="card">🃏</div>
+            <audio id="sound" autoplay>
+              <source src="https://cdn.pixabay.com/audio/2022/03/30/audio_52fdbaec16.mp3" type="audio/mpeg">
+            </audio>
+        </div>
 
-            <script>
-            const audio = document.getElementById('sound');
-            audio.play().catch(e => console.log("Autoplay prevented:", e));
+        <script>
+        const closeBtn = document.getElementById('close-btn');
+        const overlay = document.getElementById('overlay');
+        closeBtn.addEventListener('click', () => {
+            // Streamlit 자체 JS에서 상태를 직접 바꾸기 어려우므로, 여기서는 단순히 숨기기만 시도
+            overlay.style.display = 'none';
+            // 그러나 다시 렌더링되면 보일 수 있음.
+        });
 
-            setTimeout(() => {
-                document.getElementById('overlay').style.display = 'none';
-            }, 1000);
-            </script>
-            """
-            st.markdown(overlay_html, unsafe_allow_html=True)
+        // 1초 후 오버레이 자동 닫기
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            // Streamlit rerun 호출이 없으면 UI 상태와 안맞음.
+        }, 1000);
+        </script>
+        """
+        st.markdown(overlay_html, unsafe_allow_html=True)
 
-            # 1초 기다렸다가 오버레이 상태 끄기 (재렌더링 위해)
-            time.sleep(1)
+    # 오버레이를 끄는 버튼 구현 (스트림릿 버튼으로)
+    if st.session_state.show_overlay:
+        if st.button("오버레이 닫기"):
             st.session_state.show_overlay = False
             st.experimental_rerun()
-        if st.button("그만하기 (게임 종료 및 설문조사)"):
-            st.session_state.page = 'survey'
-            st.experimental_rerun()
-            return
+
             
 
     # 3️⃣ 설문 1
