@@ -80,6 +80,13 @@ def main():
         st.error(f"Google Sheets 연결 실패: {e}")
         return
 
+        # 여기 바로 아래에 카드 빛나는 이미지 리스트를 선언해 주세요.
+    card_shine_images = [
+        "https://i.imgur.com/0X1N6vI.png",  # 예시 이미지 URL (투명 배경 빛나는 카드)
+        "https://i.imgur.com/AhU6bKf.png",
+        "https://i.imgur.com/07hH9BR.png"
+    ]
+
     # 상태 초기화
     def reset_game():
         st.session_state.coins = 10
@@ -158,15 +165,35 @@ def main():
                 st.experimental_rerun()
 
     # 2️⃣ 게임 화면
-    elif st.session_state.page == 'game':
-        st.subheader(f"{st.session_state.user_name} 님의 게임")
-        if st.button("🃏 카드 선택"):
-            st.write(play_round(st.session_state.class_num))
-            st.write(f"💰 코인: {st.session_state.coins}")
-            st.write(f"📊 시도: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
-        if st.button("그만하기 (설문 이동)"):
-            st.session_state.page = 'survey'
-            st.experimental_rerun()
+   elif st.session_state.page == 'game':
+    st.subheader(f"{st.session_state.user_name} 님의 게임")
+
+    if st.button("🃏 카드 선택"):
+        # 1) 오버레이 띄울 자리 만들기
+        placeholder = st.empty()
+        
+        # 2) 이미지 랜덤 선택
+        shine_img = random.choice(card_shine_images)
+        
+        # 3) 이미지 표시 (오버레이)
+        placeholder.image(shine_img, width=200)
+        
+        # 4) 2초 대기
+        import time
+        time.sleep(2)
+        
+        # 5) 이미지 지우기 (오버레이 제거)
+        placeholder.empty()
+        
+        # 6) 게임 결과 출력
+        st.write(play_round(st.session_state.class_num))
+        st.write(f"💰 코인: {st.session_state.coins}")
+        st.write(f"📊 시도: {st.session_state.tries}, 성공: {st.session_state.successes}, 실패: {st.session_state.failures}")
+
+    if st.button("그만하기 (설문 이동)"):
+        st.session_state.page = 'survey'
+        st.experimental_rerun()
+
 
     # 3️⃣ 설문조사 (1/2)
     elif st.session_state.page == 'survey':
