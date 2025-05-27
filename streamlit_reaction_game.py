@@ -212,12 +212,13 @@ elif st.session_state.page == 'survey2':
             st.session_state.q7,
             st.session_state.q8
         ]
-        try:
-            sheet.append_row(data)
-            st.session_state.page = 'thanks'
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"❌ 설문 제출 중 오류 발생: {e}")
+       try:
+           sheet.append_row(data)
+           st.session_state.page = 'thanks'
+           st.rerun()  # ✅ 변경된 함수 사용
+       except Exception as e:
+           st.error(f"❌ 설문 제출 중 오류 발생: {e}")
+
 
 
 
