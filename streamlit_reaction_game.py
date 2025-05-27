@@ -1,15 +1,12 @@
 import streamlit as st
 import random
 import datetime
-import time
 import gspread
 from google.oauth2.service_account import Credentials
-
 def main():
     # 🎨 배경 이미지
     background_url = "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fi.scdn.co%2Fimage%2Fab67616d0000b27329e32f49d79fbf1c5621192e&type=sc960_832"
-
-    # 💄 스타일 정의
+    # 💄 스타일
     st.markdown(f"""
     <style>
     [data-testid="stAppViewContainer"] {{
@@ -38,8 +35,7 @@ def main():
     }}
     </style>
     """, unsafe_allow_html=True)
-
-    # 🃏 폰트 및 반응형 텍스트
+    # 🃏 폰트 적용 + 반응형 CSS 추가
     st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <style>
@@ -59,8 +55,9 @@ def main():
     }
     </style>
     """, unsafe_allow_html=True)
-
+    # 🎮 타이틀
     st.markdown("<h1 style='font-size: 36px;'>🃏 조커의 카드 맞추기 챌린지</h1>", unsafe_allow_html=True)
+    # 반응형 텍스트
     st.markdown("""
     <p class="responsive-text">
     🎩 <i>"어서 와~ 조커의 카드 세계에 온 걸 환영하지!"</i><br><br>
@@ -68,78 +65,18 @@ def main():
     맞출 수 있을까? 아니면 조커에게 놀아날까?
     </p>
     """, unsafe_allow_html=True)
-
     # 🔗 Google Sheets 연결
-    try:
-        creds = Credentials.from_service_account_info(
-            st.secrets["gcp_service_account"],
-            scopes=['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        )
-        client = gspread.authorize(creds)
-        sheet = client.open("도파민 타이밍 게임 기록").sheet1
-    except Exception as e:
-        st.error(f"Google Sheets 연결 실패: {e}")
-        return
-
-    # 카드 이미지 리스트
-    card_shine_images = [
-        "https://w7.pngwing.com/pngs/552/466/png-transparent-jokerz-computer-icons-playing-card-clown-joker-heroes-fictional-character-joker.png",
-        "https://w7.pngwing.com/pngs/658/87/png-transparent-black-and-gray-ace-card-united-states-playing-card-company-card-game-bicycle-plum-metal-plate-game-king-plate.png",
-        "https://w7.pngwing.com/pngs/279/765/png-transparent-ace-of-spade-playing-card-ace-of-spades-standard-52-card-deck-card-game-ace-card-game-emblem-king.png",
-        "https://w7.pngwing.com/pngs/902/280/png-transparent-ace-of-spades-playing-card-ace-of-hearts-spades-game-angle-king.png",
-        "https://w7.pngwing.com/pngs/154/969/png-transparent-ace-of-clubs-playing-card-ace-of-spades-playing-card-espadas-ace-card-game-heroes-monochrome.png",
-        "https://w7.pngwing.com/pngs/252/807/png-transparent-card-joker-harley-quinn.png",
-        "https://w7.pngwing.com/pngs/733/974/png-transparent-joker-emoji-playing-card-unicode-game-card-game-heroes-text.png",
-        "https://w7.pngwing.com/pngs/286/715/png-transparent-poker-playing-card-ace-of-spades-jack-joker-white-heroes-text.png",
-        "https://w7.pngwing.com/pngs/344/854/png-transparent-playing-card-four-card-poker-joker-standard-52-card-deck-three-card-poker-spade-game-angle-heroes.png",
-        "https://w7.pngwing.com/pngs/741/485/png-transparent-playing-card-card-game-cult-film-poker-joker-game-heroes-logo.png",
-        "https://w7.pngwing.com/pngs/800/372/png-transparent-joker-playing-card-graphy-card-game-joker-king-heroes-photography.png",
-        "https://w7.pngwing.com/pngs/531/586/png-transparent-joker-bicycle-playing-cards-united-states-playing-card-company-card-game-joker-king-heroes-text.png",
-        "https://w7.pngwing.com/pngs/244/185/png-transparent-playing-card-card-game-ace-of-spades-joker-joker.png",
-        "https://w7.pngwing.com/pngs/296/229/png-transparent-joker-playing-card-batman-text-messaging-black-card-white-mammal-heroes.png"
-    ]
-def show_overlay(card_url):
-    overlay_placeholder = st.empty()
-    overlay_placeholder.markdown(
-        f"""
-        <div style="
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999;
-        ">
-            <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
-                <h2>카드를 선택했습니다!</h2>
-                <img src="{card_url}" width="200"/>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    time.sleep(2)  # 2초 대기
-    overlay_placeholder.empty()  # 오버레이 제거
-
-st.title("카드 선택 예제")
-
-if 'selected_card' not in st.session_state:
-    st.session_state.selected_card = None
-
-if st.button("카드 선택"):
-    import random
-    selected = random.choice(card_shine_images)
-    st.session_state.selected_card = selected
-    show_overlay(selected)
-
-if st.session_state.selected_card:
-    st.write("선택된 카드:")
-    st.image(st.session_state.selected_card, width=150)
-    # 상태 초기화 함수
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scope)
+    client = gspread.authorize(creds)
+    sheet = client.open("도파민 타이밍 게임 기록").sheet1
+    # 🌟 게임 상태 초기화 함수
     def reset_game():
         st.session_state.coins = 10
         st.session_state.successes = 0
         st.session_state.failures = 0
         st.session_state.tries = 0
-
+    # 🎯 성공 확률 설정
     def get_success_probability(class_num):
         if class_num in [1, 3, 5, 7, 9]:
             return 0.5
@@ -147,69 +84,43 @@ if st.session_state.selected_card:
             return 0.1
         elif class_num in [4, 8]:
             return 0.9
-        return 0.5
-
+        else:
+            return 0.5
+    # 🃏 한 판 게임
     def play_round(class_num):
         prob = get_success_probability(class_num)
-        success = random.random() < prob
+        success_flag = random.random() < prob
+        coin_change = random.randint(30, 120)
         st.session_state.tries += 1
-
-        # 7번째 시도일 때 강제 잭팟 (코인 증가만)
-        if st.session_state.tries == 7:
-            delta = 500
-            st.session_state.coins += delta
-            if success:
-                st.session_state.successes += 1
-                return f"🎉 대박 성공! 코인이 +{delta} 증가했군! 운이 좋으시네~"
-            else:
-                st.session_state.failures += 1
-                return f"🎉 대박 보너스! 코인이 +{delta} 증가했다! 자네는 행운의 여신과 함께하나?"
-
-        jackpot_chance = 0.01
-        if success:
-            if random.random() < jackpot_chance:
-                delta = 500
-                st.session_state.coins += delta
-                st.session_state.successes += 1
-                return f"🎉 대박 성공! 코인이 +{delta} 증가했다!"
-            else:
-                delta = random.randint(30, 120)
-                st.session_state.coins += delta
-                st.session_state.successes += 1
-                return f"✅ 성공했군! 코인이 +{delta} 증가했다."
+        if success_flag:
+            st.session_state.coins += coin_change
+            st.session_state.successes += 1
+            return f"✅ 성공이군! 코인이 +{coin_change} 만큼 증가했다."
         else:
-            if random.random() < jackpot_chance:
-                delta = 500
-                st.session_state.failures += 1
-                st.session_state.coins += delta  # 실패해도 잭팟은 증가만
-                return f"😲 실패했지만 보너스! 코인이 +{delta} 증가했다!"
-            else:
-                delta = random.randint(50, 150)  # 감소 폭 증가
-                st.session_state.coins -= delta
-                st.session_state.failures += 1
-                return f"❌ 낄낄낄 실패! 코인이 -{delta} 감소했다."
-
-    # 세션 초기화
+            st.session_state.coins -= coin_change
+            st.session_state.failures += 1
+            return f"❌ 낄낄낄 실패! 코인이 -{coin_change} 만큼 감소했다."
+    # 세션 상태 초기화
     if 'page' not in st.session_state:
         st.session_state.page = 'start'
+    if 'coins' not in st.session_state:
         reset_game()
+    if 'user_name' not in st.session_state:
         st.session_state.user_name = ''
+    if 'class_num' not in st.session_state:
         st.session_state.class_num = 1
-
-    # 1️⃣ 시작 화면
+    # 1️⃣ 시작 페이지
     if st.session_state.page == 'start':
-        st.header("🎮 게임 시작")
-        user_name = st.text_input("이름 입력", value=st.session_state.user_name)
-        class_num = st.number_input("반 입력 (1~10)", min_value=1, max_value=10, value=st.session_state.class_num)
-
+        st.header("🎮 게임 시작 페이지")
+        user_name = st.text_input("이름을 입력하세요", value=st.session_state.user_name)
+        class_num = st.number_input("반을 입력하세요 (1~10)", min_value=1, max_value=10, value=st.session_state.class_num)
         if st.button("게임 시작") and user_name.strip():
             st.session_state.user_name = user_name.strip()
             st.session_state.class_num = class_num
             reset_game()
             st.session_state.page = 'game'
             st.experimental_rerun()
-            #return
-            
+            return
     # 2️⃣ 게임 페이지
     elif st.session_state.page == 'game':
         st.subheader(f"플레이어: {st.session_state.user_name} / 반: {st.session_state.class_num}")
