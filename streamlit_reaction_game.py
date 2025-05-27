@@ -115,7 +115,7 @@ def main():
                 return f"🎉 헉, 대박 성공! 코인 +{delta}! 당신은 1%의 주인공!"
             else:
                 st.session_state.failures += 1
-                return f"😲 이게 (진짜로)어떻게 나왔지?? 보너스! 코인 +{delta}! 신기한 일이군."
+                return f"😲 이게 어떻게 나왔지?? 보너스! 코인 +{delta}! 신기한 일이군."
 
         # 1% 확률로 잭팟
         jackpot_chance = 0.01
@@ -152,7 +152,7 @@ def main():
     # 1️⃣ 시작 화면
     if st.session_state.page == 'start':
         st.header("🎮 게임 시작")
-        user_name = st.text_input("이름 입력", value=st.session_state.user_name)
+        user_name = st.text_input("학교명/성명 입력", value=st.session_state.user_name)
         class_num = st.number_input("반 입력 (1~10)", min_value=1, max_value=10, value=st.session_state.class_num)
 
         if st.button("게임 시작"):
